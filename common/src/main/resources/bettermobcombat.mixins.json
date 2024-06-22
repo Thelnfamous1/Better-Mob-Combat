@@ -7,9 +7,11 @@
   "mixins": [
     "EnchantmentMixin",
     "LivingEntityMixin",
+    "MeleeAttackGoalMixin",
     "MobAccessor",
     "MobMixin",
-    "RangedWeaponItemMixin"
+    "RangedWeaponItemMixin",
+    "ServerNetworkAccessor"
   ],
   "client": [
     "AbstractZombieModelMixin",

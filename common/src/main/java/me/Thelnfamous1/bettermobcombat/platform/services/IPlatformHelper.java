@@ -1,5 +1,6 @@
 package me.Thelnfamous1.bettermobcombat.platform.services;
 
+import net.bettercombat.logic.AnimatedHand;
 import net.minecraft.world.entity.LivingEntity;
 
 public interface IPlatformHelper {
@@ -37,4 +38,8 @@ public interface IPlatformHelper {
     }
 
     boolean isCastingSpell(LivingEntity mob);
+
+    void playMobAttackAnimation(LivingEntity mob, AnimatedHand animatedHand, String animationName, float length, float upswing);
+
+    void stopMobAttackAnimation(LivingEntity mob, int downWind);
 }

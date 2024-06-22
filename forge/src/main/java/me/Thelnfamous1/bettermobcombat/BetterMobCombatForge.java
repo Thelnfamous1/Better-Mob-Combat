@@ -1,6 +1,9 @@
 package me.Thelnfamous1.bettermobcombat;
 
+import me.Thelnfamous1.bettermobcombat.network.BetterMobCombatForgeNetwork;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(Constants.MOD_ID)
 public class BetterMobCombatForge {
@@ -13,6 +16,7 @@ public class BetterMobCombatForge {
     
         // Use Forge to bootstrap the Common mod.
         BetterMobCombatCommon.init();
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent event) -> BetterMobCombatForgeNetwork.register());
         
     }
 }
