@@ -1,7 +1,7 @@
-package com.example.examplemod.platform;
+package me.Thelnfamous1.bettermobcombat.platform;
 
-import com.example.examplemod.Constants;
-import com.example.examplemod.platform.services.IPlatformHelper;
+import me.Thelnfamous1.bettermobcombat.Constants;
+import me.Thelnfamous1.bettermobcombat.platform.services.IPlatformHelper;
 
 import java.util.ServiceLoader;
 

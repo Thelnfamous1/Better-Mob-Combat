@@ -1,8 +1,8 @@
-package com.example.examplemod;
+package me.Thelnfamous1.bettermobcombat;
 
 import net.fabricmc.api.ModInitializer;
 
-public class ExampleMod implements ModInitializer {
+public class BetterMobCombatFabric implements ModInitializer {
     
     @Override
     public void onInitialize() {
@@ -12,7 +12,6 @@ public class ExampleMod implements ModInitializer {
         // project.
 
         // Use Fabric to bootstrap the Common mod.
-        Constants.LOG.info("Hello Fabric world!");
-        CommonClass.init();
+        BetterMobCombatCommon.init();
     }
 }

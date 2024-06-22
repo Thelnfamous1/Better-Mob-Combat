@@ -16,7 +16,7 @@
     "environment": "*",
     "entrypoints": {
         "main": [
-            "com.example.examplemod.ExampleMod"
+          "me.example.examplemod.ExampleMod"
         ]
     },
     "mixins": [

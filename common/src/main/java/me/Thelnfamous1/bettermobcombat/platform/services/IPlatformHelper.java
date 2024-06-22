@@ -1,4 +1,4 @@
-package com.example.examplemod.platform.services;
+package me.Thelnfamous1.bettermobcombat.platform.services;
 
 public interface IPlatformHelper {
 

@@ -74,10 +74,25 @@ minecraft {
 
 sourceSets.main.resources.srcDir 'src/generated/resources'
 
+repositories {
+    maven { url 'https://maven.kosmx.dev/' }
+    maven { url 'https://maven.shedaniel.me/' }
+    maven { url = "https://api.modrinth.com/maven" }
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly project(":common")
     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
+
+    implementation fg.deobf("maven.modrinth:better-combat:${project.better_combat_version}-forge")
+    // Better Combat Dependencies
+    implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${project.mixin_extras_version}"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:${project.mixin_extras_version}")){
+        jarJar.ranged(it, "[${project.mixin_extras_version},)")
+    }
+    implementation fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:${project.player_anim_version}")
+    implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:${project.cloth_config_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {

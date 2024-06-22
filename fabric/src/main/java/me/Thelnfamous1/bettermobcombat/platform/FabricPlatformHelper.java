@@ -1,6 +1,6 @@
-package com.example.examplemod.platform;
+package me.Thelnfamous1.bettermobcombat.platform;
 
-import com.example.examplemod.platform.services.IPlatformHelper;
+import me.Thelnfamous1.bettermobcombat.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
 
 public class FabricPlatformHelper implements IPlatformHelper {
