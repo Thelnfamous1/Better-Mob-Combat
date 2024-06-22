@@ -1,5 +1,7 @@
 package me.Thelnfamous1.bettermobcombat.platform.services;
 
+import net.minecraft.world.entity.LivingEntity;
+
 public interface IPlatformHelper {
 
     /**
@@ -33,4 +35,6 @@ public interface IPlatformHelper {
 
         return isDevelopmentEnvironment() ? "development" : "production";
     }
+
+    boolean isCastingSpell(LivingEntity mob);
 }

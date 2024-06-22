@@ -2,6 +2,7 @@ package me.Thelnfamous1.bettermobcombat.platform;
 
 import me.Thelnfamous1.bettermobcombat.platform.services.IPlatformHelper;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.world.entity.LivingEntity;
 
 public class FabricPlatformHelper implements IPlatformHelper {
 
@@ -20,5 +21,10 @@ public class FabricPlatformHelper implements IPlatformHelper {
     public boolean isDevelopmentEnvironment() {
 
         return FabricLoader.getInstance().isDevelopmentEnvironment();
+    }
+
+    @Override
+    public boolean isCastingSpell(LivingEntity mob) {
+        return false;
     }
 }

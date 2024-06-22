@@ -5,8 +5,14 @@
     "refmap": "bettermobcombat.refmap.json",
     "compatibilityLevel": "JAVA_17",
     "mixins": [
+        "EnchantmentMixin",
+        "LivingEntityMixin",
+        "MobAccessor",
+        "MobMixin",
+        "RangedWeaponItemMixin"
     ],
     "client": [
+        "MobMixinClient"
     ],
     "server": [
     ],
