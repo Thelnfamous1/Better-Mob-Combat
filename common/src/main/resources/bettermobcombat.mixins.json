@@ -1,23 +1,25 @@
 {
-    "required": true,
-    "minVersion": "0.8",
-    "package": "me.Thelnfamous1.bettermobcombat.mixin",
-    "refmap": "bettermobcombat.refmap.json",
-    "compatibilityLevel": "JAVA_17",
-    "mixins": [
-        "EnchantmentMixin",
-        "LivingEntityMixin",
-        "MobAccessor",
-        "MobMixin",
-        "RangedWeaponItemMixin"
-    ],
-    "client": [
-        "MobMixinClient"
-    ],
-    "server": [
-    ],
-    "injectors": {
-        "defaultRequire": 1
-    }
+  "required": true,
+  "minVersion": "0.8",
+  "package": "me.Thelnfamous1.bettermobcombat.mixin",
+  "refmap": "bettermobcombat.refmap.json",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "EnchantmentMixin",
+    "LivingEntityMixin",
+    "MobAccessor",
+    "MobMixin",
+    "RangedWeaponItemMixin"
+  ],
+  "client": [
+    "AbstractZombieModelMixin",
+    "AbstractZombieRendererMixin",
+    "MobMixinClient"
+  ],
+  "server": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
 
