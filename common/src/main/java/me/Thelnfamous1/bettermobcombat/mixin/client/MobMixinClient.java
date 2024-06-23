@@ -1,4 +1,4 @@
-package me.Thelnfamous1.bettermobcombat.mixin;
+package me.Thelnfamous1.bettermobcombat.mixin.client;
 
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
@@ -155,7 +155,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
             at = {@At("TAIL")}
     )
     private void postInit(EntityType<?> $$0, Level $$1, CallbackInfo ci) {
-        AnimationStack stack = ((IAnimatedPlayer) this).getAnimationStack();
+        AnimationStack stack = this.getAnimationStack();
         stack.addAnimLayer(1, this.offHandItemPose.base);
         stack.addAnimLayer(2, this.offHandBodyPose.base);
         stack.addAnimLayer(3, this.mainHandItemPose.base);

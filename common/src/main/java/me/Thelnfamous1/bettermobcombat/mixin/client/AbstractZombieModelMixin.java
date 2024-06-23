@@ -1,4 +1,4 @@
-package me.Thelnfamous1.bettermobcombat.mixin;
+package me.Thelnfamous1.bettermobcombat.mixin.client;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import dev.kosmx.playerAnim.core.impl.AnimationProcessor;
@@ -11,7 +11,6 @@ import dev.kosmx.playerAnim.impl.animation.IBendHelper;
 import net.minecraft.client.model.AbstractZombieModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -61,15 +60,15 @@ public abstract class AbstractZombieModelMixin<T extends Monster> extends Humano
         this.body.zRot = 0;
     }
 
-    @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At(value = "HEAD"))
-    private void setDefaultBeforeRender(LivingEntity par1, float par2, float par3, float par4, float par5, float par6, CallbackInfo ci){
+    @Inject(method = "setupAnim(Lnet/minecraft/world/entity/monster/Monster;FFFFF)V", at = @At(value = "HEAD"))
+    private void setDefaultBeforeRender(T $$0, float $$1, float $$2, float $$3, float $$4, float $$5, CallbackInfo ci){
         setDefaultPivot(); //to not make everything wrong
     }
 
-    @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/AbstractZombieModel;setupAnim(Lnet/minecraft/world/entity/monster/Monster;FFFFF)V", ordinal = 0, shift = At.Shift.AFTER))
-    private void setEmote(LivingEntity par1, float par2, float par3, float par4, float par5, float par6, CallbackInfo ci){
-        if(!firstPersonNext &&  ((IAnimatedPlayer)par1).playerAnimator_getAnimation().isActive()){
-            AnimationApplier emote = ((IAnimatedPlayer) par1).playerAnimator_getAnimation();
+    @Inject(method = "setupAnim(Lnet/minecraft/world/entity/monster/Monster;FFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/HumanoidModel;setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", ordinal = 0, shift = At.Shift.AFTER))
+    private void setEmote(T $$0, float $$1, float $$2, float $$3, float $$4, float $$5, CallbackInfo ci){
+        if(!firstPersonNext &&  ((IAnimatedPlayer)$$0).playerAnimator_getAnimation().isActive()){
+            AnimationApplier emote = ((IAnimatedPlayer) $$0).playerAnimator_getAnimation();
             emoteSupplier.set(emote);
 
             emote.updatePart("head", this.head);

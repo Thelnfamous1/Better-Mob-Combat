@@ -14,9 +14,9 @@
     "ServerNetworkAccessor"
   ],
   "client": [
-    "AbstractZombieModelMixin",
-    "AbstractZombieRendererMixin",
-    "MobMixinClient"
+    "client.AbstractZombieModelMixin",
+    "client.AbstractZombieRendererMixin",
+    "client.MobMixinClient"
   ],
   "server": [
   ],
