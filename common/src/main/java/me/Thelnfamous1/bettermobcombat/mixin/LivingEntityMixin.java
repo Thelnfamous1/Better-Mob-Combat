@@ -22,7 +22,7 @@ public abstract class LivingEntityMixin implements MobAttackStrength {
     public void getAttributeValue_Inject(Attribute attribute, CallbackInfoReturnable<Double> cir) {
         if ((Object)this instanceof Mob mob) {
             int comboCount = ((PlayerAttackProperties)mob).getComboCount();
-            if (mob.level().isClientSide && comboCount > 0 && MobAttackHelper.shouldAttackWithOffHand(mob, comboCount)) {
+            if (!mob.level().isClientSide && comboCount > 0 && MobAttackHelper.shouldAttackWithOffHand(mob, comboCount)) {
                 MobAttackHelper.offhandAttributes(mob, () -> {
                     double value = mob.getAttributes().getValue(attribute);
                     cir.setReturnValue(value);

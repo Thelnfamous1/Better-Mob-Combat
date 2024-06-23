@@ -37,6 +37,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -94,9 +95,16 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
 
     @Override
     public float bettermobcombat$getCurrentItemAttackStrengthDelay() {
-        double attackSpeed = 4;
+        double attackSpeed;
         if (this.getAttribute(Attributes.ATTACK_SPEED) != null) {
             attackSpeed = this.getAttributeValue(Attributes.ATTACK_SPEED);
+        } else{
+            // Mimicking logic used in LivingEntityMixin#getAttributeValue_Inject
+            ItemStack activeWeapon = !this.level().isClientSide && this.getComboCount() > 0 && MobAttackHelper.shouldAttackWithOffHand(this, this.getComboCount()) ?
+                    this.getOffhandItem():
+                    this.getMainHandItem();
+            Collection<AttributeModifier> speedMods = activeWeapon.getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_SPEED);
+            attackSpeed = MobAttackHelper.calculateAttributeValue(Attributes.ATTACK_SPEED, Attributes.ATTACK_SPEED.getDefaultValue(), speedMods);
         }
         return (float) (1.0D / attackSpeed * 20.0D);
     }

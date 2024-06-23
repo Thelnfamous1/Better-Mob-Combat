@@ -37,6 +37,7 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 public class MobAttackHelper {
@@ -333,6 +334,26 @@ public class MobAttackHelper {
             ((ServerLevel)mob.level()).sendParticles(ParticleTypes.SWEEP_ATTACK, mob.getX() + xOffset, mob.getY(0.5D), mob.getZ() + zOffset, 0, xOffset, 0.0D, zOffset, 0.0D);
         }
 
+    }
+
+    public static double calculateAttributeValue(Attribute attribute, double baseValue, Collection<AttributeModifier> modifiers) {
+        double sumValue = baseValue;
+
+        for(AttributeModifier additive : modifiers.stream().filter(mod -> mod.getOperation().equals(AttributeModifier.Operation.ADDITION)).toList()) {
+            sumValue += additive.getAmount();
+        }
+
+        double productValue = sumValue;
+
+        for(AttributeModifier baseMultiplicative : modifiers.stream().filter(mod -> mod.getOperation().equals(AttributeModifier.Operation.MULTIPLY_BASE)).toList()) {
+            productValue += sumValue * baseMultiplicative.getAmount();
+        }
+
+        for(AttributeModifier totalMultiplicative : modifiers.stream().filter(mod -> mod.getOperation().equals(AttributeModifier.Operation.MULTIPLY_TOTAL)).toList()) {
+            productValue *= 1.0D + totalMultiplicative.getAmount();
+        }
+
+        return attribute.sanitizeValue(productValue);
     }
 
     private record AttackSelection(WeaponAttributes.Attack attack, ComboState comboState) {
