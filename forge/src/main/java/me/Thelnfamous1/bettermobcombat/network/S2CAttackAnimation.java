@@ -1,21 +1,16 @@
 package me.Thelnfamous1.bettermobcombat.network;
 
 import me.Thelnfamous1.bettermobcombat.Constants;
-import net.bettercombat.client.animation.PlayerAttackAnimatable;
 import net.bettercombat.logic.AnimatedHand;
 import net.bettercombat.network.Packets;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public record S2CAttackAnimation(int mobId, AnimatedHand animatedHand, String animationName, float length, float upswing) {
     public static ResourceLocation ID = new ResourceLocation(Constants.MOD_ID, "attack_animation");
-    public static String StopSymbol = "!STOP!";
 
     public static S2CAttackAnimation read(FriendlyByteBuf buffer) {
         int mobId = buffer.readInt();
@@ -27,7 +22,7 @@ public record S2CAttackAnimation(int mobId, AnimatedHand animatedHand, String an
     }
 
     public static S2CAttackAnimation stop(int mobId, int length) {
-        return new S2CAttackAnimation(mobId, AnimatedHand.MAIN_HAND, StopSymbol, (float)length, 0.0F);
+        return new S2CAttackAnimation(mobId, AnimatedHand.MAIN_HAND, Packets.AttackAnimation.StopSymbol, (float)length, 0.0F);
     }
 
     public void write(FriendlyByteBuf buffer) {
@@ -40,14 +35,7 @@ public record S2CAttackAnimation(int mobId, AnimatedHand animatedHand, String an
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().enqueueWork(() -> {
-            Entity entity = Minecraft.getInstance().level.getEntity(this.mobId());
-            if (entity instanceof LivingEntity mob) {
-                if (this.animationName().equals(Packets.AttackAnimation.StopSymbol)) {
-                    ((PlayerAttackAnimatable)entity).stopAttackAnimation(this.length());
-                } else {
-                    ((PlayerAttackAnimatable)entity).playAttackAnimation(this.animationName(), this.animatedHand(), this.length(), this.upswing());
-                }
-            }
+            BetterMobCombatNetworkClient.handleAttackAnimation(this.mobId(), this.animationName(), this.length(), this.animatedHand(), this.upswing());
         });
         ctx.get().setPacketHandled(true);
     }

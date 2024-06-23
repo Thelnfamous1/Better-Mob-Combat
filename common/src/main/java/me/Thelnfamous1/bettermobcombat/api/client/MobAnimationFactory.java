@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * Animation factory, the factory will be invoked whenever a client-player is constructed.
+ * Animation factory, the factory will be invoked whenever a mob is constructed on the client.
  * The returned animation will be automatically registered and added to playerAssociated data.
  * <p>
  * {@link MobAnimationAccess#REGISTER_ANIMATION_EVENT} is invoked <strong>after</strong> factories are done.
@@ -42,9 +42,9 @@ public interface MobAnimationFactory {
         private record DataHolder(@Nullable ResourceLocation id, int priority, @NotNull IAnimation animation) {}
 
         @ApiStatus.Internal
-        public void prepareAnimations(Mob player, AnimationStack playerStack, Map<ResourceLocation, IAnimation> animationMap) {
+        public void prepareAnimations(Mob mob, AnimationStack playerStack, Map<ResourceLocation, IAnimation> animationMap) {
             for (Function<Mob, DataHolder> factory: factories) {
-                DataHolder dataHolder = factory.apply(player);
+                DataHolder dataHolder = factory.apply(mob);
                 if (dataHolder != null) {
                     playerStack.addAnimLayer(dataHolder.priority(), dataHolder.animation());
                     if (dataHolder.id() != null) {

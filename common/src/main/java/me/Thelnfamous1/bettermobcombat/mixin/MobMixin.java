@@ -51,6 +51,8 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     private static final UUID dualWieldingSpeedModifierId = UUID.fromString("6b364332-0dc4-11ed-861d-0242ac120002");
     @Unique
     private AttackHand lastAttack;
+    @Unique
+    private ItemStack lastItemInMainHand = ItemStack.EMPTY;
 
     @Shadow
     @Nullable
@@ -64,7 +66,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     @Unique
     private ItemStack upswingStack;
     @Unique
-    private ItemStack lastAttacedWithItemStack;
+    private ItemStack lastAttackedWithItemStack;
     @Unique
     private int upswingTicks = 0;
     @Unique
@@ -109,6 +111,12 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
         this.attackStrengthTicker = 0;
     }
 
+    @Override
+    public void swing(InteractionHand $$0) {
+        super.swing($$0);
+        this.bettercombat$resetAttackStrengthTicker();
+    }
+
     @Inject(
             method = {"tick"},
             at = {@At("TAIL")}
@@ -119,6 +127,17 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
         }
 
         this.updateDualWieldingSpeedBoost();
+
+        // Copy of attack strength logic in Player#tick
+        ++this.attackStrengthTicker;
+        ItemStack itemstack = this.getMainHandItem();
+        if (!ItemStack.matches(this.lastItemInMainHand, itemstack)) {
+            if (!ItemStack.isSameItem(this.lastItemInMainHand, itemstack)) {
+                this.bettercombat$resetAttackStrengthTicker();
+            }
+
+            this.lastItemInMainHand = itemstack.copy();
+        }
     }
 
     /*
@@ -269,12 +288,15 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                 boolean isOffHand = hand.isOffHand();
                 AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
                 Services.PLATFORM.playMobAttackAnimation(this, animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
+                Constants.LOG.debug("Triggering attack animation for {} from server with AnimatedHand {}, animation name {}, length {}, upswing {}", this, animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
                 /*
                 BetterCombatClientEvents.ATTACK_START.invoke((handler) -> {
                     handler.onPlayerAttackStart(((Mob)(Object)this), hand);
                 });
                  */
             }
+        } else{
+            Constants.LOG.debug("Upswing did not start for Mob {} due to lack of AttackHand", this);
         }
     }
 
@@ -303,7 +325,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
             this.setComboCount(0);
         }
 
-        if (!MobAttackHelper.shouldAttackWithOffHand(((Mob) (Object) this), this.getComboCount()) && (this.getMainHandItem() == null || this.lastAttacedWithItemStack != null && !this.lastAttacedWithItemStack.getItem().equals(this.getMainHandItem().getItem()))) {
+        if (!MobAttackHelper.shouldAttackWithOffHand(((Mob) (Object) this), this.getComboCount()) && (this.getMainHandItem() == null || this.lastAttackedWithItemStack != null && !this.lastAttackedWithItemStack.getItem().equals(this.getMainHandItem().getItem()))) {
             this.setComboCount(0);
         }
 
@@ -374,7 +396,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                  */
                 this.setComboCount(this.getComboCount() + 1);
                 if (!hand.isOffHand()) {
-                    this.lastAttacedWithItemStack = hand.itemStack();
+                    this.lastAttackedWithItemStack = hand.itemStack();
                 }
 
             }

@@ -18,7 +18,7 @@ public class MeleeAttackGoalMixin {
 
     @Inject(
             method = {"checkAndPerformAttack"},
-            at = {@At(value = "INVOKE", target = "Lnet/minecraft/world/entity/PathfinderMob;doHurtTarget(Lnet/minecraft/world/entity/Entity;)Z")},
+            at = {@At(value = "INVOKE", target = "Lnet/minecraft/world/entity/PathfinderMob;swing(Lnet/minecraft/world/InteractionHand;)V")},
             cancellable = true
     )
     private void pre_doHurtTarget(LivingEntity $$0, double $$1, CallbackInfo ci) {

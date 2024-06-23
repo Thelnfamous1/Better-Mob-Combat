@@ -203,9 +203,11 @@ public class MobAttackHelper {
     public static boolean doAttackWithWeapon(Mob mob) {
         WeaponAttributes attributes = WeaponRegistry.getAttributes(mob.getMainHandItem());
         if (attributes != null && attributes.attacks() != null) {
+            Constants.LOG.debug("Custom attack triggered for Mob {}", mob);
             ((MobAttackWindup)mob).bettermobcombat$startUpswing(attributes);
             return true;
         }
+        Constants.LOG.debug("No custom attack triggered for Mob {}", mob);
         return false;
     }
 
@@ -218,6 +220,7 @@ public class MobAttackHelper {
                 Constants.LOG.error("Main-hand stack: " + mob.getMainHandItem());
                 Constants.LOG.error("Off-hand stack: " + mob.getOffhandItem());
             } else {
+                Constants.LOG.debug("Server handling attack for {} - Combo count {}, Main-hand stack: {}, Off-hand stack: {}", mob, comboCount, mob.getMainHandItem(), mob.getOffhandItem());
                 WeaponAttributes.Attack attack = hand.attack();
                 WeaponAttributes attributes = hand.attributes();
                 world.getServer().executeIfPossible(() -> {
@@ -234,7 +237,7 @@ public class MobAttackHelper {
                         float dualWieldingMultiplier = getDualWieldingAttackDamageMultiplier(mob, hand) - 1.0F;
                         if (dualWieldingMultiplier != 0.0F) {
                             dualWieldingAttributes = HashMultimap.create();
-                            dualWieldingAttributes.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ServerNetworkAccessor.bettermobcombat$getDUAL_WIELDING_MODIFIER_ID(), "DUAL_WIELDING_DAMAGE_MULTIPLIER", (double)dualWieldingMultiplier, AttributeModifier.Operation.MULTIPLY_TOTAL));
+                            dualWieldingAttributes.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(ServerNetworkAccessor.bettermobcombat$getDUAL_WIELDING_MODIFIER_ID(), "DUAL_WIELDING_DAMAGE_MULTIPLIER", dualWieldingMultiplier, AttributeModifier.Operation.MULTIPLY_TOTAL));
                             mob.getAttributes().addTransientAttributeModifiers(dualWieldingAttributes);
                         }
 
@@ -267,12 +270,12 @@ public class MobAttackHelper {
                     int lastAttackedTicks = ((LivingEntityAccessor)mob).getLastAttackedTicks();
 
                     for(sweepingLevel = 0; sweepingLevel < targets.size(); ++sweepingLevel) {
-                        Entity entity = targets.get(sweepingLevel);
+                        Entity target = targets.get(sweepingLevel);
 
-                        if (entity != null && (!entity.equals(mob.getVehicle()) || TargetHelper.isAttackableMount(entity)) && (!(entity instanceof ArmorStand) || !((ArmorStand)entity).isMarker())) {
+                        if (target != null && (!target.equals(mob.getVehicle()) || TargetHelper.isAttackableMount(target)) && (!(target instanceof ArmorStand) || !((ArmorStand)target).isMarker())) {
                             LivingEntity livingEntity;
-                            if (entity instanceof LivingEntity) {
-                                livingEntity = (LivingEntity)entity;
+                            if (target instanceof LivingEntity) {
+                                livingEntity = (LivingEntity)target;
                                 if (BetterCombat.config.allow_fast_attacks) {
                                     livingEntity.invulnerableTime = 0;
                                 }
@@ -283,15 +286,16 @@ public class MobAttackHelper {
                             }
 
                             ((LivingEntityAccessor)mob).setLastAttackedTicks(lastAttackedTicks);
-                            if (entity instanceof ItemEntity || entity instanceof ExperienceOrb || entity instanceof AbstractArrow || entity == mob) {
+                            if (target instanceof ItemEntity || target instanceof ExperienceOrb || target instanceof AbstractArrow || target == mob) {
                                 Constants.LOG.warn("Mob {} tried to attack an invalid entity", mob.getName().getString());
                                 return;
                             }
 
-                            mob.doHurtTarget(entity);
+                            mob.doHurtTarget(target);
+                            Constants.LOG.debug("Mob {} is attacking {}", mob, target);
 
-                            if (entity instanceof LivingEntity) {
-                                livingEntity = (LivingEntity)entity;
+                            if (target instanceof LivingEntity) {
+                                livingEntity = (LivingEntity)target;
                                 if (knockbackMultiplier != 1.0F) {
                                     ((ConfigurableKnockback)livingEntity).setKnockbackMultiplier_BetterCombat(1.0F);
                                 }
@@ -316,7 +320,7 @@ public class MobAttackHelper {
                         mob.getAttributes().removeAttributeModifiers(sweepingModifiers);
                     }
 
-                    ((PlayerAttackProperties)mob).setComboCount(-1);
+                    //((PlayerAttackProperties)mob).setComboCount(-1);
                 });
             }
         }

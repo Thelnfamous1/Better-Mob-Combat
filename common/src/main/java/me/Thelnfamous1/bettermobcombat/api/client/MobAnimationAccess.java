@@ -34,9 +34,9 @@ public final class MobAnimationAccess {
      * @throws IllegalArgumentException if the given argument is not a mob, or api mixins have failed (normally never)
      * @implNote data is stored in the mob object (using mixins), using it is more efficient than any objectMap as objectMap solution does not know when to delete the data.
      */
-    public static PlayerAssociatedAnimationData getPlayerAssociatedData(@NotNull Mob mob) {
+    public static MobAssociatedAnimationData getPlayerAssociatedData(@NotNull Mob mob) {
         if (mob instanceof IAnimatedPlayer animatedPlayer) {
-            return new PlayerAssociatedAnimationData(animatedPlayer);
+            return new MobAssociatedAnimationData(animatedPlayer);
         } else throw new IllegalArgumentException(mob + " is not a mob or library mixins failed");
     }
 
@@ -63,11 +63,11 @@ public final class MobAnimationAccess {
         void registerAnimation(@NotNull Mob mob, @NotNull AnimationStack animationStack);
     }
 
-    public static class PlayerAssociatedAnimationData {
+    public static class MobAssociatedAnimationData {
         @NotNull
         private final IAnimatedPlayer mob;
 
-        public PlayerAssociatedAnimationData(@NotNull IAnimatedPlayer mob) {
+        public MobAssociatedAnimationData(@NotNull IAnimatedPlayer mob) {
             this.mob = mob;
         }
 

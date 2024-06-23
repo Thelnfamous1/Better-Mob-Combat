@@ -12,6 +12,7 @@ import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
+import me.Thelnfamous1.bettermobcombat.Constants;
 import me.Thelnfamous1.bettermobcombat.api.client.MobAnimationAccess;
 import me.Thelnfamous1.bettermobcombat.api.client.MobAnimationFactory;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
@@ -102,7 +103,6 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
         }
     }
 
-    @SuppressWarnings("ConstantConditions") // When injected into PlayerEntity, instance check can tell if a ClientPlayer or ServerPlayer
     @Inject(method = "tick", at = @At("HEAD"))
     private void tick(CallbackInfo ci) {
         if (this.level().isClientSide) {
@@ -173,20 +173,21 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
         ItemStack mainHandStack = mob.getMainHandItem();
         if (!mob.swinging && !mob.isSwimming() && !mob.isUsingItem() && !Services.PLATFORM.isCastingSpell(mob) && !CrossbowItem.isCharged(mainHandStack)) {
             if (hasActiveAttackAnimation) {
+                if(this.getType() == EntityType.HUSK) Constants.LOG.debug("Mob {} has active attack animation", this);
                 ((LivingEntityAccessor) mob).invokeTurnHead(mob.getYHeadRot(), 0.0F);
             }
 
             KeyframeAnimation newMainHandPose = null;
             WeaponAttributes mainHandAttributes = WeaponRegistry.getAttributes(mainHandStack);
             if (mainHandAttributes != null && mainHandAttributes.pose() != null) {
-                newMainHandPose = (KeyframeAnimation) AnimationRegistry.animations.get(mainHandAttributes.pose());
+                newMainHandPose = AnimationRegistry.animations.get(mainHandAttributes.pose());
             }
 
             KeyframeAnimation newOffHandPose = null;
             if (MobAttackHelper.isDualWielding(mob)) {
                 WeaponAttributes offHandAttributes = WeaponRegistry.getAttributes(mob.getOffhandItem());
                 if (offHandAttributes != null && offHandAttributes.offHandPose() != null) {
-                    newOffHandPose = (KeyframeAnimation) AnimationRegistry.animations.get(offHandAttributes.offHandPose());
+                    newOffHandPose = AnimationRegistry.animations.get(offHandAttributes.offHandPose());
                 }
             }
 
@@ -199,18 +200,20 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
 
             this.mainHandBodyPose.setPose(newMainHandPose, isLeftHanded);
             this.offHandBodyPose.setPose(newOffHandPose, isLeftHanded);
+            //if(this.getType() == EntityType.HUSK) Constants.LOG.debug("Setting new poses for Mob {} ", this);
         } else {
-            this.mainHandBodyPose.setPose((KeyframeAnimation) null, isLeftHanded);
-            this.mainHandItemPose.setPose((KeyframeAnimation) null, isLeftHanded);
-            this.offHandBodyPose.setPose((KeyframeAnimation) null, isLeftHanded);
-            this.offHandItemPose.setPose((KeyframeAnimation) null, isLeftHanded);
+            //if(this.getType() == EntityType.HUSK) Constants.LOG.debug("Resetting poses for Mob {} ", this);
+            this.mainHandBodyPose.setPose(null, isLeftHanded);
+            this.mainHandItemPose.setPose(null, isLeftHanded);
+            this.offHandBodyPose.setPose(null, isLeftHanded);
+            this.offHandItemPose.setPose(null, isLeftHanded);
         }
     }
 
     @Override
     public void playAttackAnimation(String name, AnimatedHand animatedHand, float length, float upswing) {
         try {
-            KeyframeAnimation animation = (KeyframeAnimation) AnimationRegistry.animations.get(name);
+            KeyframeAnimation animation = AnimationRegistry.animations.get(name);
             KeyframeAnimation.AnimationBuilder copy = animation.mutableCopy();
             this.updateAnimationByCurrentActivity(copy);
             copy.torso.fullyEnablePart(true);
@@ -223,13 +226,14 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
 
             int fadeIn = copy.beginTick;
             float upswingSpeed = speed / BetterCombat.config.getUpswingMultiplier();
-            float downwindSpeed = (float) ((double) speed * Mth.lerp(Math.max((double) BetterCombat.config.getUpswingMultiplier() - 0.5, 0.0) / 0.5, (double) (1.0F - upswing), (double) (upswing / (1.0F - upswing))));
+            float downwindSpeed = (float) ((double) speed * Mth.lerp(Math.max((double) BetterCombat.config.getUpswingMultiplier() - 0.5, 0.0) / 0.5, 1.0F - upswing, upswing / (1.0F - upswing)));
             this.attackAnimation.speed.set(upswingSpeed, List.of(new TransmissionSpeedModifier.Gear(length * upswing, downwindSpeed), new TransmissionSpeedModifier.Gear(length, speed)));
             this.attackAnimation.mirror.setEnabled(mirror);
             CustomAnimationPlayer player = new CustomAnimationPlayer(copy.build(), 0);
             player.setFirstPersonMode(CompatibilityFlags.firstPersonRender() ? FirstPersonMode.THIRD_PERSON_MODEL : FirstPersonMode.NONE);
             player.setFirstPersonConfiguration(this.firstPersonConfig(animatedHand));
             this.attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeIn, Ease.INOUTSINE), player);
+            Constants.LOG.debug("Playing attack animation for Mob {}", this);
         } catch (Exception var13) {
             var13.printStackTrace();
         }
@@ -248,12 +252,12 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
             float pitch;
             if (FirstPersonMode.isFirstPersonPass()) {
                 pitch = this.getXRot();
-                pitch = (float) Math.toRadians((double) pitch);
+                pitch = (float) Math.toRadians(pitch);
                 switch (partName) {
                     case "body":
                         rotationX -= pitch;
                         if (pitch < 0.0F) {
-                            double offset = Math.abs(Math.sin((double) pitch));
+                            double offset = Math.abs(Math.sin(pitch));
                             offsetY = (float) ((double) offsetY + offset * 0.5);
                             offsetZ = (float) ((double) offsetZ - offset);
                         }
@@ -263,7 +267,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
                 }
             } else {
                 pitch = this.getXRot();
-                pitch = (float) Math.toRadians((double) pitch);
+                pitch = (float) Math.toRadians(pitch);
                 switch (partName) {
                     case "body":
                         rotationX -= pitch * 0.75F;
@@ -355,7 +359,8 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
         if (currentAnimation != null && currentAnimation instanceof KeyframeAnimationPlayer) {
             int fadeOut = Math.round(length);
             this.attackAnimation.adjustmentModifier.fadeOut(fadeOut);
-            this.attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeOut, Ease.INOUTSINE), (IAnimation) null);
+            this.attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeOut, Ease.INOUTSINE), null);
+            Constants.LOG.debug("Stopping attack animation for Mob {}", this);
         }
 
     }
