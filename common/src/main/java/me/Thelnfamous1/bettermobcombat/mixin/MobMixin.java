@@ -2,6 +2,8 @@ package me.Thelnfamous1.bettermobcombat.mixin;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.Thelnfamous1.bettermobcombat.Constants;
 import me.Thelnfamous1.bettermobcombat.api.client.BetterMobCombatClientEvents;
 import me.Thelnfamous1.bettermobcombat.client.collision.MobTargetFinder;
@@ -33,7 +35,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -55,7 +56,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     @Unique
     private ItemStack lastItemInMainHand = ItemStack.EMPTY;
     @Unique
-    private int missTime;
+    private int attackCooldown;
 
     @Shadow
     @Nullable
@@ -228,21 +229,21 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
         }
     }
 
-    @Redirect(
+    @WrapOperation(
             method = {"doHurtTarget"},
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/entity/Mob;getMainHandItem()Lnet/minecraft/world/item/ItemStack;"
             )
     )
-    public ItemStack getMainHandStack_Redirect(Mob instance) {
+    public ItemStack getMainHandStack_Redirect(Mob instance, Operation<ItemStack> original) {
         if (this.comboCount < 0) {
-            return instance.getMainHandItem();
+            return original.call(instance);
         } else {
             AttackHand hand = MobAttackHelper.getCurrentAttack(instance, this.comboCount);
             if (hand == null) {
                 boolean isOffHand = MobAttackHelper.shouldAttackWithOffHand(instance, this.comboCount);
-                return isOffHand ? ItemStack.EMPTY : instance.getMainHandItem();
+                return isOffHand ? ItemStack.EMPTY : original.call(instance);
             } else {
                 this.lastAttack = hand;
                 return hand.itemStack();
@@ -282,7 +283,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
         AttackHand hand = this.getCurrentHand();
         if (hand != null) {
             float upswingRate = (float) hand.upswingRate();
-            if (this.upswingTicks <= 0 && this.missTime <= 0 && !this.isUsingItem() && !(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - (double) upswingRate)) {
+            if (this.upswingTicks <= 0 && this.attackCooldown <= 0 && !this.isUsingItem() && !(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - (double) upswingRate)) {
                 this.releaseUsingItem();
                 this.lastAttacked = 0;
                 this.upswingStack = this.getMainHandItem();
@@ -291,7 +292,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                 this.comboReset = Math.round(attackCooldownTicksFloat * BetterCombat.config.combo_reset_rate);
                 this.upswingTicks = Math.max(Math.round(attackCooldownTicksFloat * upswingRate), 1);
                 this.lastSwingDuration = attackCooldownTicksFloat;
-                this.setMiningCooldown(attackCooldownTicks);
+                this.setAttackCooldown(attackCooldownTicks);
                 String animationName = hand.attack().animation();
                 boolean isOffHand = hand.isOffHand();
                 AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
@@ -367,8 +368,8 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     )
     private void pre_Tick(CallbackInfo ci) {
         if (!this.level().isClientSide) {
-            if (this.missTime > 0) {
-                --this.missTime;
+            if (this.attackCooldown > 0) {
+                --this.attackCooldown;
             }
             this.targetsInReach = null;
             ++this.lastAttacked;
@@ -424,8 +425,8 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     }
 
     @Unique
-    private void setMiningCooldown(int ticks) {
-        this.missTime = ticks;
+    private void setAttackCooldown(int ticks) {
+        this.attackCooldown = ticks;
     }
 
     @Unique
@@ -433,7 +434,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
         int downWind = (int) Math.round((double) MobAttackHelper.getAttackCooldownTicksCapped(((Mob) (Object) this)) * (1.0 - 0.5 * (double) BetterCombat.config.upswing_multiplier));
         Services.PLATFORM.stopMobAttackAnimation(this, downWind);
         this.upswingStack = null;
-        this.setMiningCooldown(0);
+        this.setAttackCooldown(0);
     }
 
     @Unique

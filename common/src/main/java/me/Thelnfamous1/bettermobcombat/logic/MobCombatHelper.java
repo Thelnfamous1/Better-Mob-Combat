@@ -115,15 +115,14 @@ public class MobCombatHelper {
                         Entity target = targets.get(sweepingLevel);
 
                         if (target != null && (!target.equals(mob.getVehicle()) || TargetHelper.isAttackableMount(target)) && (!(target instanceof ArmorStand) || !((ArmorStand)target).isMarker())) {
-                            LivingEntity livingEntity;
-                            if (target instanceof LivingEntity) {
-                                livingEntity = (LivingEntity)target;
+                            LivingEntity livingTarget = target instanceof LivingEntity ? (LivingEntity) target : null;
+                            if (livingTarget != null) {
                                 if (BetterCombat.config.allow_fast_attacks) {
-                                    livingEntity.invulnerableTime = 0;
+                                    livingTarget.invulnerableTime = 0;
                                 }
 
                                 if (knockbackMultiplier != 1.0F) {
-                                    ((ConfigurableKnockback)livingEntity).setKnockbackMultiplier_BetterCombat(knockbackMultiplier);
+                                    ((ConfigurableKnockback)livingTarget).setKnockbackMultiplier_BetterCombat(knockbackMultiplier);
                                 }
                             }
 
@@ -135,10 +134,9 @@ public class MobCombatHelper {
 
                             mob.doHurtTarget(target);
 
-                            if (target instanceof LivingEntity) {
-                                livingEntity = (LivingEntity)target;
+                            if (livingTarget != null) {
                                 if (knockbackMultiplier != 1.0F) {
-                                    ((ConfigurableKnockback)livingEntity).setKnockbackMultiplier_BetterCombat(1.0F);
+                                    ((ConfigurableKnockback)livingTarget).setKnockbackMultiplier_BetterCombat(1.0F);
                                 }
                             }
                         }
