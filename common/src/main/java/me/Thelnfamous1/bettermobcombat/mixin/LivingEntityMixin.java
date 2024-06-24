@@ -1,6 +1,5 @@
 package me.Thelnfamous1.bettermobcombat.mixin;
 
-import me.Thelnfamous1.bettermobcombat.logic.MobAttackStrength;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
 import net.bettercombat.logic.PlayerAttackProperties;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin implements MobAttackStrength {
+public abstract class LivingEntityMixin {
 
     @Inject(
             method = {"getAttributeValue(Lnet/minecraft/world/entity/ai/attributes/Attribute;)D"},
