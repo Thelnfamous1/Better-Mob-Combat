@@ -28,12 +28,12 @@ public abstract class AbstractZombieRendererMixin <
     }
 
     @Override
-    public void render(T entity, float $$1, float $$2, PoseStack $$3, MultiBufferSource $$4, int $$5) {
+    public void render(T zombie, float $$1, float $$2, PoseStack $$3, MultiBufferSource $$4, int $$5) {
         if (FirstPersonMode.isFirstPersonPass()) {
-            var animationApplier = ((IAnimatedPlayer) entity).playerAnimator_getAnimation();
+            var animationApplier = ((IAnimatedPlayer) zombie).playerAnimator_getAnimation();
             var config = animationApplier.getFirstPersonConfiguration();
 
-            if (entity == Minecraft.getInstance().getCameraEntity()) {
+            if (zombie == Minecraft.getInstance().getCameraEntity()) {
                 // Hiding all parts, because they should not be visible in first person
                 setAllPartsVisible(false);
                 // Showing arms based on configuration
@@ -45,7 +45,7 @@ public abstract class AbstractZombieRendererMixin <
         }
 
         // No `else` case needed to show parts, since the default state should be correct already
-        super.render(entity, $$1, $$2, $$3, $$4, $$5);
+        super.render(zombie, $$1, $$2, $$3, $$4, $$5);
     }
 
     @Unique
@@ -61,9 +61,9 @@ public abstract class AbstractZombieRendererMixin <
     }
 
     @Override
-    protected void setupRotations(T $$0, PoseStack matrixStack, float $$2, float $$3, float tickDelta) {
-        super.setupRotations($$0, matrixStack, $$2, $$3, tickDelta);
-        var animationPlayer = ((IAnimatedPlayer) $$0).playerAnimator_getAnimation();
+    protected void setupRotations(T zombie, PoseStack matrixStack, float $$2, float $$3, float tickDelta) {
+        super.setupRotations(zombie, matrixStack, $$2, $$3, tickDelta);
+        var animationPlayer = ((IAnimatedPlayer) zombie).playerAnimator_getAnimation();
         animationPlayer.setTickDelta(tickDelta);
         if(animationPlayer.isActive()){
 

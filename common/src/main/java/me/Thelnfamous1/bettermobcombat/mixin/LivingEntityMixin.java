@@ -1,6 +1,6 @@
 package me.Thelnfamous1.bettermobcombat.mixin;
 
-import me.Thelnfamous1.bettermobcombat.duck.MobAttackStrength;
+import me.Thelnfamous1.bettermobcombat.logic.MobAttackStrength;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
 import net.bettercombat.logic.PlayerAttackProperties;
 import net.minecraft.world.entity.LivingEntity;

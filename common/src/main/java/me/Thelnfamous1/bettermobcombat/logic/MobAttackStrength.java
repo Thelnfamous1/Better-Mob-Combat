@@ -1,4 +1,4 @@
-package me.Thelnfamous1.bettermobcombat.duck;
+package me.Thelnfamous1.bettermobcombat.logic;
 
 public interface MobAttackStrength {
 

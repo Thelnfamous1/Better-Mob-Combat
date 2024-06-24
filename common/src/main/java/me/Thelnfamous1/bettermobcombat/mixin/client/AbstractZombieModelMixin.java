@@ -66,9 +66,9 @@ public abstract class AbstractZombieModelMixin<T extends Monster> extends Humano
     }
 
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/monster/Monster;FFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/HumanoidModel;setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", ordinal = 0, shift = At.Shift.AFTER))
-    private void setEmote(T $$0, float $$1, float $$2, float $$3, float $$4, float $$5, CallbackInfo ci){
-        if(!firstPersonNext &&  ((IAnimatedPlayer)$$0).playerAnimator_getAnimation().isActive()){
-            AnimationApplier emote = ((IAnimatedPlayer) $$0).playerAnimator_getAnimation();
+    private void setEmote(T zombie, float $$1, float $$2, float $$3, float $$4, float $$5, CallbackInfo ci){
+        if(!firstPersonNext && ((IAnimatedPlayer)zombie).playerAnimator_getAnimation().isActive()){
+            AnimationApplier emote = ((IAnimatedPlayer) zombie).playerAnimator_getAnimation();
             emoteSupplier.set(emote);
 
             emote.updatePart("head", this.head);
@@ -106,7 +106,13 @@ public abstract class AbstractZombieModelMixin<T extends Monster> extends Humano
     @WrapWithCondition(method = "setupAnim",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/AnimationUtils;animateZombieArms(Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;ZFF)V")
     )
-    private boolean onlyAnimateZombieArmsIfAllowed(ModelPart $$0, ModelPart $$1, boolean $$2, float $$3, float $$4) {
-        return false;
+    private boolean onlyAnimateZombieArmsIfAllowed(ModelPart leftArm, ModelPart rightArm, boolean aggressive, float attackTime, float bob,
+                                                   T zombie,
+                                                   float $$1,
+                                                   float $$2,
+                                                   float $$3,
+                                                   float $$4,
+                                                   float $$5) {
+        return !((IAnimatedPlayer) zombie).playerAnimator_getAnimation().isActive();
     }
 }
