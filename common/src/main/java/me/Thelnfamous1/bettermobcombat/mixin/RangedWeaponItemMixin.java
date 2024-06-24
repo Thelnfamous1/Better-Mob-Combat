@@ -2,7 +2,7 @@ package me.Thelnfamous1.bettermobcombat.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
+import me.Thelnfamous1.bettermobcombat.logic.MobCombatHelper;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -27,7 +27,7 @@ public class RangedWeaponItemMixin {
     private static ItemStack getHeldProjectile_Wrapped_BetterMobCombat(LivingEntity entity, InteractionHand hand, Operation<ItemStack> original) {
         ItemStack originalResult = original.call(entity, hand);
         if (entity instanceof Mob mob) {
-            return MobAttackHelper.getDirectOffhand(mob);
+            return MobCombatHelper.getDirectOffhand(mob);
         } else {
             return originalResult;
         }

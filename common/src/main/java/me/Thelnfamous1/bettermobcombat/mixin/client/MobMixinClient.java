@@ -233,7 +233,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
             player.setFirstPersonMode(CompatibilityFlags.firstPersonRender() ? FirstPersonMode.THIRD_PERSON_MODEL : FirstPersonMode.NONE);
             player.setFirstPersonConfiguration(this.firstPersonConfig(animatedHand));
             this.attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeIn, Ease.INOUTSINE), player);
-            Constants.LOG.debug("Playing attack animation for Mob {}", this);
+            Constants.LOG.debug("Playing attack animation for Mob {} of length {}", this, length);
         } catch (Exception var13) {
             var13.printStackTrace();
         }

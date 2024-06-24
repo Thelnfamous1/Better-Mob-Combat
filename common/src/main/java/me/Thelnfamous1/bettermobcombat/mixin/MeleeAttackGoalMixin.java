@@ -1,6 +1,6 @@
 package me.Thelnfamous1.bettermobcombat.mixin;
 
-import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
+import me.Thelnfamous1.bettermobcombat.logic.MobCombatHelper;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
@@ -22,7 +22,7 @@ public class MeleeAttackGoalMixin {
             cancellable = true
     )
     private void pre_doHurtTarget(LivingEntity $$0, double $$1, CallbackInfo ci) {
-        if(MobAttackHelper.doAttackWithWeapon(this.mob)){
+        if(MobCombatHelper.doAttackWithWeapon(this.mob)){
             ci.cancel();
         }
 

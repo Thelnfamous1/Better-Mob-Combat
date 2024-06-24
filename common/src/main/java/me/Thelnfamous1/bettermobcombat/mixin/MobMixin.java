@@ -7,6 +7,7 @@ import me.Thelnfamous1.bettermobcombat.client.collision.MobTargetFinder;
 import me.Thelnfamous1.bettermobcombat.duck.MobAttackStrength;
 import me.Thelnfamous1.bettermobcombat.duck.MobAttackWindup;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
+import me.Thelnfamous1.bettermobcombat.logic.MobCombatHelper;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.AttackHand;
@@ -18,12 +19,10 @@ import net.bettercombat.logic.PlayerAttackProperties;
 import net.bettercombat.logic.WeaponRegistry;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -54,6 +53,8 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     private AttackHand lastAttack;
     @Unique
     private ItemStack lastItemInMainHand = ItemStack.EMPTY;
+    @Unique
+    private int missTime;
 
     @Shadow
     @Nullable
@@ -61,8 +62,6 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
 
     @Shadow
     public abstract boolean doHurtTarget(Entity $$0);
-
-    @Shadow protected abstract InteractionResult mobInteract(Player $$0, InteractionHand $$1);
 
     @Unique
     private ItemStack upswingStack;
@@ -104,7 +103,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                     this.getOffhandItem():
                     this.getMainHandItem();
             Collection<AttributeModifier> speedMods = activeWeapon.getAttributeModifiers(EquipmentSlot.MAINHAND).get(Attributes.ATTACK_SPEED);
-            attackSpeed = MobAttackHelper.calculateAttributeValue(Attributes.ATTACK_SPEED, Attributes.ATTACK_SPEED.getDefaultValue(), speedMods);
+            attackSpeed = MobCombatHelper.calculateAttributeValue(Attributes.ATTACK_SPEED, Attributes.ATTACK_SPEED.getDefaultValue(), speedMods);
         }
         return (float) (1.0D / attackSpeed * 20.0D);
     }
@@ -172,14 +171,14 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     )
     public void getEquippedStack_Pre(EquipmentSlot slot, CallbackInfoReturnable<ItemStack> cir) {
         boolean mainHandHasTwoHanded = false;
-        ItemStack mainHandStack = MobAttackHelper.getDirectMainhand((Mob) (Object) this);
+        ItemStack mainHandStack = MobCombatHelper.getDirectMainhand((Mob) (Object) this);
         WeaponAttributes mainHandAttributes = WeaponRegistry.getAttributes(mainHandStack);
         if (mainHandAttributes != null && mainHandAttributes.isTwoHanded()) {
             mainHandHasTwoHanded = true;
         }
 
         boolean offHandHasTwoHanded = false;
-        ItemStack offHandStack = MobAttackHelper.getDirectOffhand((Mob) (Object) this);
+        ItemStack offHandStack = MobCombatHelper.getDirectOffhand((Mob) (Object) this);
         WeaponAttributes offHandAttributes = WeaponRegistry.getAttributes(offHandStack);
         if (offHandAttributes != null && offHandAttributes.isTwoHanded()) {
             offHandHasTwoHanded = true;
@@ -282,7 +281,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
         AttackHand hand = this.getCurrentHand();
         if (hand != null) {
             float upswingRate = (float) hand.upswingRate();
-            if (this.upswingTicks <= 0 /*&& this.missTime <= 0*/ && !this.isUsingItem() && !(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - (double) upswingRate)) {
+            if (this.upswingTicks <= 0 && this.missTime <= 0 && !this.isUsingItem() && !(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - (double) upswingRate)) {
                 this.releaseUsingItem();
                 this.lastAttacked = 0;
                 this.upswingStack = this.getMainHandItem();
@@ -370,6 +369,9 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     )
     private void pre_Tick(CallbackInfo ci) {
         if (!this.level().isClientSide) {
+            if (this.missTime > 0) {
+                --this.missTime;
+            }
             this.targetsInReach = null;
             ++this.lastAttacked;
             this.cancelSwingIfNeeded();
@@ -394,7 +396,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                     // PlatformClient.onEmptyLeftClick(((Mob)(Object)this));
                 }
 
-                MobAttackHelper.processAttack(this.level(), ((Mob) (Object) this), this.getComboCount(), targets);
+                MobCombatHelper.processAttack(this.level(), ((Mob) (Object) this), this.getComboCount(), targets);
 
                 this.bettercombat$resetAttackStrengthTicker();
                 /*
@@ -427,10 +429,8 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
 
     @Unique
     private void setMiningCooldown(int ticks) {
-        /*
-        Minecraft client = this.thisClient();
-        ((MinecraftClientAccessor)client).setAttackCooldown(ticks);
-         */
+        this.missTime = ticks;
+        Constants.LOG.debug("Mob {} now has an attack cooldown of {}", this, this.missTime);
     }
 
     @Unique
