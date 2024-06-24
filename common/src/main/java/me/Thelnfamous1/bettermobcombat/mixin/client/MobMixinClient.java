@@ -12,7 +12,6 @@ import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
-import me.Thelnfamous1.bettermobcombat.Constants;
 import me.Thelnfamous1.bettermobcombat.api.client.MobAnimationAccess;
 import me.Thelnfamous1.bettermobcombat.api.client.MobAnimationFactory;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
@@ -173,7 +172,6 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
         ItemStack mainHandStack = mob.getMainHandItem();
         if (!mob.swinging && !mob.isSwimming() && !mob.isUsingItem() && !Services.PLATFORM.isCastingSpell(mob) && !CrossbowItem.isCharged(mainHandStack)) {
             if (hasActiveAttackAnimation) {
-                if(this.getType() == EntityType.HUSK) Constants.LOG.debug("Mob {} has active attack animation", this);
                 ((LivingEntityAccessor) mob).invokeTurnHead(mob.getYHeadRot(), 0.0F);
             }
 
@@ -200,9 +198,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
 
             this.mainHandBodyPose.setPose(newMainHandPose, isLeftHanded);
             this.offHandBodyPose.setPose(newOffHandPose, isLeftHanded);
-            //if(this.getType() == EntityType.HUSK) Constants.LOG.debug("Setting new poses for Mob {} ", this);
         } else {
-            //if(this.getType() == EntityType.HUSK) Constants.LOG.debug("Resetting poses for Mob {} ", this);
             this.mainHandBodyPose.setPose(null, isLeftHanded);
             this.mainHandItemPose.setPose(null, isLeftHanded);
             this.offHandBodyPose.setPose(null, isLeftHanded);
@@ -233,7 +229,6 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
             player.setFirstPersonMode(CompatibilityFlags.firstPersonRender() ? FirstPersonMode.THIRD_PERSON_MODEL : FirstPersonMode.NONE);
             player.setFirstPersonConfiguration(this.firstPersonConfig(animatedHand));
             this.attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeIn, Ease.INOUTSINE), player);
-            Constants.LOG.debug("Playing attack animation for Mob {} of length {}", this, length);
         } catch (Exception var13) {
             var13.printStackTrace();
         }
@@ -360,7 +355,6 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
             int fadeOut = Math.round(length);
             this.attackAnimation.adjustmentModifier.fadeOut(fadeOut);
             this.attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeOut, Ease.INOUTSINE), null);
-            Constants.LOG.debug("Stopping attack animation for Mob {}", this);
         }
 
     }

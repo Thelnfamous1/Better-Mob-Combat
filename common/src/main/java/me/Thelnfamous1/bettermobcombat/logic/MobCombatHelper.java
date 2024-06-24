@@ -48,11 +48,9 @@ public class MobCombatHelper {
     public static boolean doAttackWithWeapon(Mob mob) {
         WeaponAttributes attributes = WeaponRegistry.getAttributes(mob.getMainHandItem());
         if (attributes != null && attributes.attacks() != null) {
-            Constants.LOG.debug("Custom attack triggered for Mob {}", mob);
             ((MobAttackWindup)mob).bettermobcombat$startUpswing(attributes);
             return true;
         }
-        Constants.LOG.debug("No custom attack triggered for Mob {}", mob);
         return false;
     }
 
@@ -65,7 +63,6 @@ public class MobCombatHelper {
                 Constants.LOG.error("Main-hand stack: " + mob.getMainHandItem());
                 Constants.LOG.error("Off-hand stack: " + mob.getOffhandItem());
             } else {
-                Constants.LOG.debug("Server handling attack for {} - Combo count {}, Main-hand stack: {}, Off-hand stack: {}", mob, comboCount, mob.getMainHandItem(), mob.getOffhandItem());
                 WeaponAttributes.Attack attack = hand.attack();
                 WeaponAttributes attributes = hand.attributes();
                 world.getServer().executeIfPossible(() -> {
@@ -132,12 +129,11 @@ public class MobCombatHelper {
 
                             ((LivingEntityAccessor)mob).setLastAttackedTicks(lastAttackedTicks);
                             if (target instanceof ItemEntity || target instanceof ExperienceOrb || target instanceof AbstractArrow || target == mob) {
-                                Constants.LOG.warn("Mob {} tried to attack an invalid entity", mob.getName().getString());
+                                Constants.LOG.error("{} tried to attack an invalid entity - {}", mob.getName().getString(), target);
                                 return;
                             }
 
                             mob.doHurtTarget(target);
-                            Constants.LOG.debug("Mob {} is attacking {}", mob, target);
 
                             if (target instanceof LivingEntity) {
                                 livingEntity = (LivingEntity)target;

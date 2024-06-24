@@ -1,5 +1,15 @@
 package me.Thelnfamous1.bettermobcombat;
 
+import me.Thelnfamous1.bettermobcombat.api.client.BetterMobCombatClientEvents;
+import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
+import net.bettercombat.api.AttackHand;
+import net.bettercombat.api.client.BetterCombatClientEvents;
+import net.bettercombat.logic.AnimatedHand;
+import net.bettercombat.logic.PlayerAttackHelper;
+import net.minecraft.world.entity.LivingEntity;
+
+import java.util.function.Function;
+
 // This class is part of the common project meaning it is shared between all supported loaders. Code written here can only
 // import and access the vanilla codebase, libraries used by vanilla, and optionally third party libraries that provide
 // common compatible binaries. This means common code can not directly use loader specific concepts such as Forge events
@@ -15,5 +25,20 @@ public class BetterMobCombatCommon {
         // your own abstraction layer. You can learn more about this in our provided services class. In this example
         // we have an interface in the common code and use a loader specific implementation to delegate our call to
         // the platform specific approach.
+        BetterMobCombatClientEvents.ATTACK_START.register((mob, attackHand) -> {
+            debugTriggeredAttack(mob, attackHand, MobAttackHelper::getAttackCooldownTicksCapped);
+        });
+        BetterCombatClientEvents.ATTACK_START.register((player, attackHand) -> {
+            debugTriggeredAttack(player, attackHand, PlayerAttackHelper::getAttackCooldownTicksCapped);
+        });
+    }
+
+    private static <T extends LivingEntity> void debugTriggeredAttack(T entity, AttackHand attackHand, Function<T, Float> attackCooldownGetter) {
+        float upswingRate = (float) attackHand.upswingRate();
+        float attackCooldownTicksFloat = attackCooldownGetter.apply(entity);
+        String animationName = attackHand.attack().animation();
+        boolean isOffHand = attackHand.isOffHand();
+        AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attackHand.attributes().isTwoHanded());
+        Constants.LOG.debug("Triggering attack animation for {} from server with AnimatedHand {}, animation name {}, length {}, upswing {}", entity, animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
     }
 }

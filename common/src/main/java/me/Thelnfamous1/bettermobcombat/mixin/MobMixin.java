@@ -3,6 +3,7 @@ package me.Thelnfamous1.bettermobcombat.mixin;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import me.Thelnfamous1.bettermobcombat.Constants;
+import me.Thelnfamous1.bettermobcombat.api.client.BetterMobCombatClientEvents;
 import me.Thelnfamous1.bettermobcombat.client.collision.MobTargetFinder;
 import me.Thelnfamous1.bettermobcombat.duck.MobAttackStrength;
 import me.Thelnfamous1.bettermobcombat.duck.MobAttackWindup;
@@ -295,15 +296,12 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                 boolean isOffHand = hand.isOffHand();
                 AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
                 Services.PLATFORM.playMobAttackAnimation(this, animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
-                Constants.LOG.debug("Triggering attack animation for {} from server with AnimatedHand {}, animation name {}, length {}, upswing {}", this, animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
-                /*
-                BetterCombatClientEvents.ATTACK_START.invoke((handler) -> {
-                    handler.onPlayerAttackStart(((Mob)(Object)this), hand);
+                BetterMobCombatClientEvents.ATTACK_START.invoke((handler) -> {
+                    handler.onMobAttackStart(((Mob)(Object)this), hand);
                 });
-                 */
             }
         } else{
-            Constants.LOG.debug("Upswing did not start for Mob {} due to lack of AttackHand", this);
+            Constants.LOG.error("Upswing did not start for {} due to lack of AttackHand", this);
         }
     }
 
@@ -399,11 +397,9 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                 MobCombatHelper.processAttack(this.level(), ((Mob) (Object) this), this.getComboCount(), targets);
 
                 this.bettercombat$resetAttackStrengthTicker();
-                /*
-                BetterCombatClientEvents.ATTACK_HIT.invoke((handler) -> {
-                    handler.onPlayerAttackStart(((Mob)(Object)this), hand, targets, cursorTarget);
+                BetterMobCombatClientEvents.ATTACK_HIT.invoke((handler) -> {
+                    handler.onMobAttackHit(((Mob)(Object)this), hand, targets, cursorTarget);
                 });
-                 */
                 this.setComboCount(this.getComboCount() + 1);
                 if (!hand.isOffHand()) {
                     this.lastAttackedWithItemStack = hand.itemStack();
@@ -430,7 +426,6 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     @Unique
     private void setMiningCooldown(int ticks) {
         this.missTime = ticks;
-        Constants.LOG.debug("Mob {} now has an attack cooldown of {}", this, this.missTime);
     }
 
     @Unique
