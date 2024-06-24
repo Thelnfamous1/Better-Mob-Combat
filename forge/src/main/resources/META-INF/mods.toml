@@ -24,3 +24,9 @@ mandatory = true
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
+[[dependencies.${mod_id}]]
+modId = "bettercombat"
+mandatory = true
+versionRange = "${better_combat_version_range}"
+ordering = "NONE"
+side = "BOTH"

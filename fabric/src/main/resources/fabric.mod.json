@@ -1,6 +1,6 @@
 {
     "schemaVersion": 1,
-    "id": "mod_id",
+    "id": "bettermobcombat",
     "version": "${version}",
     "name": "${mod_name}",
     "description": "${description}",

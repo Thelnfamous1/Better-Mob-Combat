@@ -100,6 +100,12 @@ tasks.withType(JavaCompile).configureEach {
 }
 tasks.withType(Javadoc).configureEach {
     source(project(":common").sourceSets.main.allJava)
+    configure(options) {
+        tags(
+                'apiNote:a:"API Note:"',
+                'implNote:a:"Implementation Note:"'
+        )
+    }
 }
 tasks.named("sourcesJar", Jar) {
     from(project(":common").sourceSets.main.allSource)
