@@ -39,6 +39,6 @@ public class BetterMobCombatCommon {
         String animationName = attackHand.attack().animation();
         boolean isOffHand = attackHand.isOffHand();
         AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attackHand.attributes().isTwoHanded());
-        Constants.LOG.debug("Triggering attack animation for {} from server with AnimatedHand {}, animation name {}, length {}, upswing {}", entity, animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
+        Constants.LOG.debug("Triggering attack animation for {} with AnimatedHand {}, animation name {}, length {}, upswing {}", entity, animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
     }
 }

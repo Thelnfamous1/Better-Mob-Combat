@@ -62,7 +62,7 @@ public abstract class AbstractZombieModelMixin<T extends Monster> extends Humano
 
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/monster/Monster;FFFFF)V", at = @At(value = "HEAD"))
     private void setDefaultBeforeRender(T $$0, float $$1, float $$2, float $$3, float $$4, float $$5, CallbackInfo ci){
-        setDefaultPivot(); //to not make everything wrong
+        //setDefaultPivot(); //to not make everything wrong
     }
 
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/monster/Monster;FFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/HumanoidModel;setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", ordinal = 0, shift = At.Shift.AFTER))

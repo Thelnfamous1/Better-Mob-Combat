@@ -167,7 +167,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
     @Override
     public void updateAnimationsOnTick() {
         Mob mob = (Mob) (Object) this;
-        boolean isLeftHanded = this.isMainArmleft();
+        boolean isLeftHanded = this.isMainArmLeft();
         boolean hasActiveAttackAnimation = this.attackAnimation.base.getAnimation() != null && this.attackAnimation.base.getAnimation().isActive();
         ItemStack mainHandStack = mob.getMainHandItem();
         if (!mob.swinging && !mob.isSwimming() && !mob.isUsingItem() && !Services.PLATFORM.isCastingSpell(mob) && !CrossbowItem.isCharged(mainHandStack)) {
@@ -216,7 +216,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
             copy.head.pitch.setEnabled(false);
             float speed = (float) animation.endTick / length;
             boolean mirror = animatedHand.isOffHand();
-            if (this.isMainArmleft()) {
+            if (this.isMainArmLeft()) {
                 mirror = !mirror;
             }
 
@@ -344,7 +344,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
     }
 
     @Unique
-    public boolean isMainArmleft() {
+    public boolean isMainArmLeft() {
         return this.getMainArm() == HumanoidArm.LEFT;
     }
 
