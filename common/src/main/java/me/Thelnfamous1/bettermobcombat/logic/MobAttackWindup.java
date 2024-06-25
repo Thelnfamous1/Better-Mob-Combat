@@ -8,6 +8,8 @@ public interface MobAttackWindup {
 
     int bettermobcombat$getUpswingTicks();
 
+    int bettermobcombat$getAttackCooldown();
+
     float bettermobcombat$getSwingProgress();
 
     default boolean isWeaponSwingInProgress() {

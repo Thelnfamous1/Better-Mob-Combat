@@ -424,6 +424,11 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
         }
     }
 
+    @Override
+    public int bettermobcombat$getAttackCooldown(){
+        return this.attackCooldown;
+    }
+
     @Unique
     private void setAttackCooldown(int ticks) {
         this.attackCooldown = ticks;
@@ -468,5 +473,15 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     @Override
     public void setComboCount(int comboCount) {
         this.comboCount = comboCount;
+    }
+
+    @Inject(method = "isWithinMeleeAttackRange", at = @At("HEAD"), cancellable = true)
+    private void pre_isWithinMeleeAttackRange(LivingEntity target, CallbackInfoReturnable<Boolean> cir){
+        MobCombatHelper.onHoldingAnimatedAttackWeapon((Mob) (Object)this, (m, wa) -> {
+            AttackHand currentAttack = this.getCurrentAttack();
+            if(currentAttack != null){
+                cir.setReturnValue(MobCombatHelper.isWithinAttackRange(m, target, currentAttack.attack(), wa.attackRange()));
+            }
+        });
     }
 }

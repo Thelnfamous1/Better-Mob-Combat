@@ -3,11 +3,15 @@ package me.Thelnfamous1.bettermobcombat.logic;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import me.Thelnfamous1.bettermobcombat.Constants;
+import me.Thelnfamous1.bettermobcombat.client.collision.MobTargetFinder;
 import me.Thelnfamous1.bettermobcombat.mixin.MobAccessor;
 import me.Thelnfamous1.bettermobcombat.mixin.ServerNetworkAccessor;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.WeaponAttributes;
+import net.bettercombat.api.client.AttackRangeExtensions;
+import net.bettercombat.client.collision.OrientedBoundingBox;
+import net.bettercombat.client.collision.WeaponHitBoxes;
 import net.bettercombat.logic.PlayerAttackProperties;
 import net.bettercombat.logic.TargetHelper;
 import net.bettercombat.logic.WeaponRegistry;
@@ -31,11 +35,14 @@ import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class MobCombatHelper {
+
     public static ItemStack getDirectMainhand(Mob mob){
         return ((MobAccessor)mob).bettermobcombat$getHandItems().get(EquipmentSlot.MAINHAND.getIndex());
     }
@@ -44,13 +51,11 @@ public class MobCombatHelper {
         return ((MobAccessor)mob).bettermobcombat$getHandItems().get(EquipmentSlot.OFFHAND.getIndex());
     }
 
-    public static boolean doAttackWithWeapon(Mob mob) {
+    public static void onHoldingAnimatedAttackWeapon(Mob mob, BiConsumer<Mob, WeaponAttributes> callback) {
         WeaponAttributes attributes = WeaponRegistry.getAttributes(mob.getMainHandItem());
         if (attributes != null && attributes.attacks() != null) {
-            ((MobAttackWindup)mob).bettermobcombat$startUpswing(attributes);
-            return true;
+            callback.accept(mob, attributes);
         }
-        return false;
     }
 
     public static void processAttack(Level world, Mob mob, int comboCount, List<Entity> targets){
@@ -191,5 +196,24 @@ public class MobCombatHelper {
         }
 
         return attribute.sanitizeValue(productValue);
+    }
+
+    public static boolean isWithinAttackRange(LivingEntity mob, Entity target, WeaponAttributes.Attack attack, double attackRange) {
+        Vec3 origin = MobTargetFinder.getInitialTracingPoint(mob);
+        if (!AttackRangeExtensions.sources().isEmpty()) {
+            attackRange = MobTargetFinder.applyAttackRangeModifiers(mob, attackRange);
+        }
+
+        boolean isSpinAttack = attack.angle() > 180.0;
+        Vec3 size = WeaponHitBoxes.createHitbox(attack.hitbox(), attackRange, isSpinAttack);
+        OrientedBoundingBox obb = new OrientedBoundingBox(origin, size, mob.getXRot(), mob.getYRot());
+        if (!isSpinAttack) {
+            obb = obb.offsetAlongAxisZ(size.z / 2.0);
+        }
+
+        obb.updateVertex();
+        return (new MobTargetFinder.CollisionFilter(obb))
+                .and(new MobTargetFinder.RadialFilter(origin, obb.axisZ, attackRange, attack.angle()))
+                .test(target, mob);
     }
 }

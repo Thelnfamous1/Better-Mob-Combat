@@ -25,6 +25,7 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public class MobTargetFinder {
@@ -53,7 +54,7 @@ public class MobTargetFinder {
         return new TargetFinder.TargetResult(entities, obb);
     }
 
-    private static double applyAttackRangeModifiers(LivingEntity mob, double attackRange) {
+    public static double applyAttackRangeModifiers(LivingEntity mob, double attackRange) {
         MobAttackRangeExtensions.Context context = new MobAttackRangeExtensions.Context(mob, attackRange);
         List<AttackRangeExtensions.Modifier> modifiers = MobAttackRangeExtensions.sources().stream().map((function) -> function.apply(context)).sorted(Comparator.comparingInt(AttackRangeExtensions.Modifier::operationOrder)).toList();
         double result = attackRange;
@@ -94,8 +95,10 @@ public class MobTargetFinder {
             this.obb = obb;
         }
 
-        public List<Entity> filter(List<Entity> entities, LivingEntity mob) {
-            return entities.stream().filter((entity) -> this.obb.intersects(entity.getBoundingBox().inflate(entity.getPickRadius())) || this.obb.contains(entity.position().add(0.0, entity.getBbHeight() / 2.0F, 0.0))).collect(Collectors.toList());
+        @Override
+        public boolean test(Entity target, LivingEntity mob) {
+            return this.obb.intersects(target.getBoundingBox().inflate(target.getPickRadius()))
+                    || this.obb.contains(target.position().add(0.0, target.getBbHeight() / 2.0F, 0.0));
         }
     }
 
@@ -112,13 +115,14 @@ public class MobTargetFinder {
             this.attackAngle = Mth.clamp(attackAngle, 0.0, 360.0);
         }
 
-        public List<Entity> filter(List<Entity> entities, LivingEntity mob) {
-            return entities.stream().filter((entity) -> {
-                double maxAngleDif = this.attackAngle / 2.0;
-                Vec3 distanceVector = CollisionHelper.distanceVector(this.origin, entity.getBoundingBox());
-                Vec3 positionVector = entity.position().add(0.0, entity.getBbHeight() / 2.0F, 0.0).subtract(this.origin);
-                return distanceVector.length() <= this.attackRange && (this.attackAngle == 0.0 || CollisionHelper.angleBetween(positionVector, this.orientation) <= maxAngleDif || CollisionHelper.angleBetween(distanceVector, this.orientation) <= maxAngleDif) && (BetterCombat.config.allow_attacking_thru_walls || rayContainsNoObstacle(this.origin, this.origin.add(distanceVector), mob) || rayContainsNoObstacle(this.origin, this.origin.add(positionVector), mob));
-            }).collect(Collectors.toList());
+        @Override
+        public boolean test(Entity target, LivingEntity mob) {
+            double maxAngleDif = this.attackAngle / 2.0;
+            Vec3 distanceVector = CollisionHelper.distanceVector(this.origin, target.getBoundingBox());
+            Vec3 positionVector = target.position().add(0.0, target.getBbHeight() / 2.0F, 0.0).subtract(this.origin);
+            return distanceVector.length() <= this.attackRange
+                    && (this.attackAngle == 0.0 || CollisionHelper.angleBetween(positionVector, this.orientation) <= maxAngleDif || CollisionHelper.angleBetween(distanceVector, this.orientation) <= maxAngleDif)
+                    && (BetterCombat.config.allow_attacking_thru_walls || rayContainsNoObstacle(this.origin, this.origin.add(distanceVector), mob) || rayContainsNoObstacle(this.origin, this.origin.add(positionVector), mob));
         }
 
         private static boolean rayContainsNoObstacle(Vec3 start, Vec3 end, LivingEntity mob) {
@@ -127,7 +131,9 @@ public class MobTargetFinder {
         }
     }
 
-    public interface Filter {
-        List<Entity> filter(List<Entity> var1, LivingEntity mob);
+    public interface Filter extends BiPredicate<Entity, LivingEntity> {
+        default List<Entity> filter(List<Entity> targets, LivingEntity mob) {
+            return targets.stream().filter((target) -> this.test(target, mob)).collect(Collectors.toList());
+        }
     }
 }
