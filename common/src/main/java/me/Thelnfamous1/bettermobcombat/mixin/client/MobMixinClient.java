@@ -12,9 +12,9 @@ import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
+import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
 import me.Thelnfamous1.bettermobcombat.minecraftApi.MobAnimationAccess;
 import me.Thelnfamous1.bettermobcombat.minecraftApi.MobAnimationFactory;
-import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.WeaponAttributes;
@@ -25,10 +25,12 @@ import net.bettercombat.client.animation.modifier.TransmissionSpeedModifier;
 import net.bettercombat.compatibility.CompatibilityFlags;
 import net.bettercombat.logic.AnimatedHand;
 import net.bettercombat.logic.WeaponRegistry;
-import net.bettercombat.mixin.LivingEntityAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -175,7 +177,9 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
         ItemStack mainHandStack = mob.getMainHandItem();
         if (!mob.swinging && !mob.isSwimming() && !mob.isUsingItem() && !Services.PLATFORM.isCastingSpell(mob) && !CrossbowItem.isCharged(mainHandStack)) {
             if (hasActiveAttackAnimation) {
-                ((LivingEntityAccessor) mob).invokeTurnHead(mob.getYHeadRot(), 0.0F);
+                // Mobs override LivingEntity#tickHeadTurn to tick their body controller instead
+                //((LivingEntityAccessor) mob).invokeTurnHead(mob.getYHeadRot(), 0.0F);
+                super.tickHeadTurn(getYHeadRot(), 0.0F);
             }
 
             KeyframeAnimation newMainHandPose = null;
