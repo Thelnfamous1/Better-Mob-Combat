@@ -27,7 +27,7 @@ public abstract class GuardMeleeGoalMixin extends MeleeAttackGoal {
     }
 
     @Inject(
-            method = "checkAndPerformAttack", remap = false,
+            method = "checkAndPerformAttack", remap = true,
             at = @At("HEAD"),
             cancellable = true
     )
