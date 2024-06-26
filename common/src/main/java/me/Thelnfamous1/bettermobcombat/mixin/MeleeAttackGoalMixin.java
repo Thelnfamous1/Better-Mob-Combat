@@ -16,9 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(MeleeAttackGoal.class)
-public class MeleeAttackGoalMixin {
+public abstract class MeleeAttackGoalMixin {
 
     @Shadow @Final protected PathfinderMob mob;
+
+    @Shadow protected abstract void resetAttackCooldown();
 
     @Inject(
             method = "checkAndPerformAttack",
@@ -30,8 +32,10 @@ public class MeleeAttackGoalMixin {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat)this.mob).getCurrentAttack();
             if(currentAttack != null){
                 ci.cancel();
-                if(((MobAttackWindup)m).bettermobcombat$getAttackCooldown() >= 0 && MobCombatHelper.isWithinAttackRange(m, this.mob.getTarget(), currentAttack.attack(), wa.attackRange()))
+                if(((MobAttackWindup)m).bettermobcombat$getAttackCooldown() >= 0 && MobCombatHelper.isWithinAttackRange(m, this.mob.getTarget(), currentAttack.attack(), wa.attackRange())){
                     ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
+                    this.resetAttackCooldown();
+                }
             }
         });
     }

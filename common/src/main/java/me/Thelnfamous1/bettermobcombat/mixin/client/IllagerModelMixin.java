@@ -129,14 +129,14 @@ public abstract class IllagerModelMixin<T extends AbstractIllager> extends Hiera
                                                    float $$3,
                                                    float $$4,
                                                    float $$5) {
-        return !((IAnimatedPlayer) illager).playerAnimator_getAnimation().isActive();
+        return !MobPlayerModel.bettermobcombat$isAnimating(illager);
     }
 
     @WrapWithCondition(method = "setupAnim",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/AnimationUtils;swingWeaponDown(Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/world/entity/Mob;FF)V")
     )
     private boolean onlyAnimateWeaponSwingIfAllowed(ModelPart leftArm, ModelPart rightArm, Mob mob, float attackTime, float bob) {
-        return !((IAnimatedPlayer) mob).playerAnimator_getAnimation().isActive();
+        return !MobPlayerModel.bettermobcombat$isAnimating(mob);
     }
 
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/monster/AbstractIllager;FFFFF)V", at = @At("TAIL"))

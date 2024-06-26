@@ -30,3 +30,9 @@ mandatory = true
 versionRange = "${better_combat_version_range}"
 ordering = "NONE"
 side = "BOTH"
+[[dependencies.${mod_id}]]
+modId = "guardvillagers"
+mandatory = false
+versionRange = "${guard_villagers_version_range}"
+ordering = "NONE"
+side = "BOTH"

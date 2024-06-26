@@ -96,6 +96,9 @@ dependencies {
     }
     implementation fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:${project.player_anim_version}")
     implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:${project.cloth_config_version}")
+
+    // Mod Compatibility
+    implementation fg.deobf("maven.modrinth:guard-villagers:${project.guard_villagers_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {

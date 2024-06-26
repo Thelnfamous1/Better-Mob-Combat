@@ -72,7 +72,8 @@ subprojects {
                 "mod_id": mod_id,
                 "license": license,
                 "description": project.description,
-                "better_combat_version_range": better_combat_version_range
+                "better_combat_version_range": better_combat_version_range,
+                "guard_villagers_version_range": guard_villagers_version_range
         ]
 
         filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json']) {
