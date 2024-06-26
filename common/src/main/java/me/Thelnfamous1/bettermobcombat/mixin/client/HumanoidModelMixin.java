@@ -4,9 +4,8 @@ import dev.kosmx.playerAnim.core.impl.AnimationProcessor;
 import dev.kosmx.playerAnim.core.util.SetableSupplier;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.IMutableModel;
-import dev.kosmx.playerAnim.impl.IPlayerModel;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
-import dev.kosmx.playerAnim.impl.animation.IBendHelper;
+import me.Thelnfamous1.bettermobcombat.api.client.MobPlayerModel;
 import net.minecraft.client.model.*;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,7 +22,7 @@ import java.util.function.Function;
 @Mixin(value = HumanoidModel.class, priority = 2000)//Apply after NotEnoughAnimation's inject
 public abstract class HumanoidModelMixin<T extends LivingEntity>
         extends AgeableListModel<T>
-        implements ArmedModel, HeadedModel, IPlayerModel {
+        implements ArmedModel, HeadedModel, MobPlayerModel {
 
 
     @Shadow @Final public ModelPart leftLeg;
@@ -40,14 +39,17 @@ public abstract class HumanoidModelMixin<T extends LivingEntity>
 
     @Inject(method = "<init>(Lnet/minecraft/client/model/geom/ModelPart;Ljava/util/function/Function;)V", at = @At("RETURN"))
     private void initBendableStuff(ModelPart $$0, Function $$1, CallbackInfo ci){
-        IMutableModel thisWithMixin = (IMutableModel) this;
-        bettermobcombat$emoteSupplier.set(null);
+        if(!this.bettermobcombat$isPlayerModel()){
+            IMutableModel thisWithMixin = (IMutableModel) this;
+            bettermobcombat$emoteSupplier.set(null);
 
-        thisWithMixin.setEmoteSupplier(bettermobcombat$emoteSupplier);
+            thisWithMixin.setEmoteSupplier(bettermobcombat$emoteSupplier);
+        }
     }
 
+    @Unique
     private boolean bettermobcombat$isPlayerModel(){
-        return (HumanoidModel)(Object)this instanceof PlayerModel<?>;
+        return PlayerModel.class.isInstance(this);
     }
 
     @Unique
@@ -103,18 +105,13 @@ public abstract class HumanoidModelMixin<T extends LivingEntity>
             else {
                 bettermobcombat$firstPersonNext = false;
                 bettermobcombat$emoteSupplier.set(null);
-                bettermobcombat$resetBend(this.body);
-                bettermobcombat$resetBend(this.leftArm);
-                bettermobcombat$resetBend(this.rightArm);
-                bettermobcombat$resetBend(this.leftLeg);
-                bettermobcombat$resetBend(this.rightLeg);
+                MobPlayerModel.bettermobcombat$resetBend(this.body);
+                MobPlayerModel.bettermobcombat$resetBend(this.leftArm);
+                MobPlayerModel.bettermobcombat$resetBend(this.rightArm);
+                MobPlayerModel.bettermobcombat$resetBend(this.leftLeg);
+                MobPlayerModel.bettermobcombat$resetBend(this.rightLeg);
             }
         }
-    }
-
-    @Unique
-    private static void bettermobcombat$resetBend(ModelPart part) {
-        IBendHelper.INSTANCE.bend(part, null);
     }
 
     @Override

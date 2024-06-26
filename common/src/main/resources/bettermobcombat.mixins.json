@@ -11,16 +11,20 @@
     "MobAccessor",
     "MobMixin",
     "RangedWeaponItemMixin",
-    "ServerNetworkAccessor"
+    "ServerNetworkAccessor",
+    "client.HierarchicalModelMixin",
+    "client.IllagerModelMixin"
   ],
   "client": [
     "client.AbstractZombieModelMixin",
+    "client.EntityModelMixin",
     "client.HumanoidMobRendererMixin",
     "client.HumanoidModelMixin",
     "client.LivingEntityRendererMixin",
     "client.MobMixinClient",
     "client.MobRendererMixin",
-    "client.SkeletonModelMixin"
+    "client.SkeletonModelMixin",
+    "client.ZombieVillagerModelMixin"
   ],
   "server": [
   ],
