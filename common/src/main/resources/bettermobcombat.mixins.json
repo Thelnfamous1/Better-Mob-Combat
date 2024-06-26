@@ -15,8 +15,12 @@
   ],
   "client": [
     "client.AbstractZombieModelMixin",
-    "client.AbstractZombieRendererMixin",
-    "client.MobMixinClient"
+    "client.HumanoidMobRendererMixin",
+    "client.HumanoidModelMixin",
+    "client.LivingEntityRendererMixin",
+    "client.MobMixinClient",
+    "client.MobRendererMixin",
+    "client.SkeletonModelMixin"
   ],
   "server": [
   ],

@@ -12,6 +12,9 @@ mixin {
 
     config("${mod_id}.mixins.json")
     config("${mod_id}.forge.mixins.json")
+
+    // Enables exporting mixin-changed classes to .mixin.out in the run folder
+    debug.export = true
 }
 
 minecraft {
