@@ -135,7 +135,7 @@ public abstract class IllagerModelMixin<T extends AbstractIllager> extends Hiera
     @WrapWithCondition(method = "setupAnim",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/AnimationUtils;swingWeaponDown(Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/world/entity/Mob;FF)V")
     )
-    private boolean onlyAnimateWeaponSwingIfAllowed(ModelPart leftArm, ModelPart rightArm, Mob mob, float attackTime, float bob) {
+    private boolean onlyAnimateWeaponSwingIfAllowed(ModelPart rightArm, ModelPart leftArm, Mob mob, float attackTime, float bob) {
         return !MobPlayerModel.bettermobcombat$isAnimating(mob);
     }
 

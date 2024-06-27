@@ -5,8 +5,6 @@ import me.Thelnfamous1.bettermobcombat.logic.MobCombatHelper;
 import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.EntityPlayer_BetterCombat;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
@@ -18,13 +16,9 @@ import tallestegg.guardvillagers.entities.Guard;
 
 @Pseudo
 @Mixin(value = Guard.GuardMeleeGoal.class, remap = false)
-public abstract class GuardMeleeGoalMixin extends MeleeAttackGoal {
+public abstract class GuardMeleeGoalMixin extends MeleeAttackGoalMixin {
 
     @Shadow @Final public Guard guard;
-
-    public GuardMeleeGoalMixin(PathfinderMob p_25552_, double p_25553_, boolean p_25554_) {
-        super(p_25552_, p_25553_, p_25554_);
-    }
 
     @Inject(
             method = "checkAndPerformAttack", remap = true,
@@ -38,7 +32,7 @@ public abstract class GuardMeleeGoalMixin extends MeleeAttackGoal {
                 ci.cancel();
                 if(((MobAttackWindup)m).bettermobcombat$getAttackCooldown() >= 0 && MobCombatHelper.isWithinAttackRange(m, this.guard.getTarget(), currentAttack.attack(), wa.attackRange())){
                     ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
-                    this.resetAttackCooldown();
+                    this.bettermobcombat$setTicksUntilNextAttack(((MobAttackWindup)m).bettermobcombat$getAttackCooldown());
                     // Guard specific attack handling
                     this.guard.stopUsingItem();
                     if (this.guard.shieldCoolDown == 0) {

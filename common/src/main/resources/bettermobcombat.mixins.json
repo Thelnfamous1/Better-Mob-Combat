@@ -8,6 +8,7 @@
     "EnchantmentMixin",
     "LivingEntityMixin",
     "MeleeAttackGoalMixin",
+    "MeleeAttackMixin",
     "MobAccessor",
     "MobMixin",
     "RangedWeaponItemMixin",
@@ -23,6 +24,7 @@
     "client.LivingEntityRendererMixin",
     "client.MobMixinClient",
     "client.MobRendererMixin",
+    "client.PiglinModelMixin",
     "client.SkeletonModelMixin",
     "client.ZombieVillagerModelMixin"
   ],

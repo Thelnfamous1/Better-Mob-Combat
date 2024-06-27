@@ -33,9 +33,9 @@ public abstract class HumanoidModelMixin<T extends LivingEntity>
     @Shadow @Final public ModelPart body;
     @Shadow @Final public ModelPart hat;
     @Unique
-    private final SetableSupplier<AnimationProcessor> bettermobcombat$emoteSupplier = new SetableSupplier<>();
+    protected final SetableSupplier<AnimationProcessor> bettermobcombat$emoteSupplier = new SetableSupplier<>();
     @Unique
-    private boolean bettermobcombat$firstPersonNext = false;
+    protected boolean bettermobcombat$firstPersonNext = false;
 
     @Inject(method = "<init>(Lnet/minecraft/client/model/geom/ModelPart;Ljava/util/function/Function;)V", at = @At("RETURN"))
     private void initBendableStuff(ModelPart $$0, Function $$1, CallbackInfo ci){
