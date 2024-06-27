@@ -28,21 +28,22 @@ public abstract class MeleeAttackMixin {
 
     @Inject(method = "lambda$create$0", at = @At(value = "HEAD"), cancellable = true)
     private static void pre_executeMeleeAttack(BehaviorBuilder.Instance instance, MemoryAccessor attackTarget, MemoryAccessor nvle, MemoryAccessor lookTarget, MemoryAccessor attackCoolingDown, int $$5x, ServerLevel $$6, Mob mob, long $$8, CallbackInfoReturnable<Boolean> cir){
-        LivingEntity target = (LivingEntity)instance.get(attackTarget);
-        if(!isHoldingUsableProjectileWeapon(mob) && ((NearestVisibleLivingEntities)instance.get(nvle)).contains(target)){
-            MobCombatHelper.onHoldingAnimatedAttackWeapon(mob, (m, wa) -> {
-                AttackHand currentAttack = ((EntityPlayer_BetterCombat)m).getCurrentAttack();
-                if(currentAttack != null){
-                    if(((MobAttackWindup)m).bettermobcombat$getAttackCooldown() >= 0 && mob.isWithinMeleeAttackRange(target)){
-                        ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
-                        lookTarget.set(new EntityTracker(target, true));
-                        attackCoolingDown.setWithExpiry(true, ((MobAttackWindup)m).bettermobcombat$getAttackCooldown());
-                        cir.setReturnValue(true);
-                    } else{
-                        cir.setReturnValue(false);
-                    }
+        MobCombatHelper.onHoldingAnimatedAttackWeapon(mob, (m, wa) -> {
+            AttackHand currentAttack = ((EntityPlayer_BetterCombat)m).getCurrentAttack();
+            if(currentAttack != null){
+                LivingEntity target = (LivingEntity)instance.get(attackTarget);
+                if(!isHoldingUsableProjectileWeapon(mob)
+                        && ((MobAttackWindup)m).bettermobcombat$getAttackCooldown() >= 0
+                        && mob.isWithinMeleeAttackRange(target)
+                        && ((NearestVisibleLivingEntities)instance.get(nvle)).contains(target)){
+                    ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
+                    lookTarget.set(new EntityTracker(target, true));
+                    attackCoolingDown.setWithExpiry(true, ((MobAttackWindup)m).bettermobcombat$getAttackCooldown());
+                    cir.setReturnValue(true);
+                } else{
+                    cir.setReturnValue(false);
                 }
-            });
-        }
+            }
+        });
     }
 }
