@@ -32,9 +32,9 @@ public abstract class MeleeAttackMixin {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat)m).getCurrentAttack();
             if(currentAttack != null){
                 LivingEntity target = (LivingEntity)instance.get(attackTarget);
-                if(!isHoldingUsableProjectileWeapon(mob)
+                if(!isHoldingUsableProjectileWeapon(m)
                         && ((MobAttackWindup)m).bettermobcombat$getAttackCooldown() >= 0
-                        && mob.isWithinMeleeAttackRange(target)
+                        && m.isWithinMeleeAttackRange(target)
                         && ((NearestVisibleLivingEntities)instance.get(nvle)).contains(target)){
                     ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
                     lookTarget.set(new EntityTracker(target, true));
