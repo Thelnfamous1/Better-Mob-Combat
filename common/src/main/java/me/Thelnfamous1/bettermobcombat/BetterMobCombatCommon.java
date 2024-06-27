@@ -57,7 +57,7 @@ public class BetterMobCombatCommon {
     public static void updateServerConfig(BMCServerConfig config, boolean log) {
         serverConfig = config;
         serverConfigSerialized = config.serialize();
-        if(log) Constants.LOG.info("Server config updated!");
+        if(log) Constants.LOG.info("Server config updated! {}", serverConfigSerialized);
     }
 
     public static String getServerConfigSerialized() {

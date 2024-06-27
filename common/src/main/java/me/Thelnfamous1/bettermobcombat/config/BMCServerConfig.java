@@ -11,11 +11,11 @@ import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 )
 public class BMCServerConfig implements ConfigData {
     public static final Gson GSON = new Gson();
-    @Comment("The additional attack cooldown applied to a mob, in ticks, after it launches a Better Combat attack. In vanilla, there is usually a delay of 20 ticks between a mob's attacks.")
+    @Comment("The additional attack cooldown applied to a mob, in ticks, after it launches a Better Combat attack. \nIn vanilla, there is usually a delay of 20 ticks between a mob's attacks. \n7 was chosen because a default Better Combat sword attack takes 13 ticks.")
     @ConfigEntry.BoundedDiscrete(
             max = 100L
     )
-    public int mob_additional_attack_cooldown = 20;
+    public int mob_additional_attack_cooldown = 7;
 
     public BMCServerConfig() {
     }
