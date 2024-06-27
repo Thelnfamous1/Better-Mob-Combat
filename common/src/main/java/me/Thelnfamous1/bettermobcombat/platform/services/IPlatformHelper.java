@@ -1,6 +1,7 @@
 package me.Thelnfamous1.bettermobcombat.platform.services;
 
 import net.bettercombat.logic.AnimatedHand;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 
 public interface IPlatformHelper {
@@ -42,4 +43,6 @@ public interface IPlatformHelper {
     void playMobAttackAnimation(LivingEntity mob, AnimatedHand animatedHand, String animationName, float length, float upswing);
 
     void stopMobAttackAnimation(LivingEntity mob, int downWind);
+
+    void updateServerConfig(ServerPlayer player);
 }

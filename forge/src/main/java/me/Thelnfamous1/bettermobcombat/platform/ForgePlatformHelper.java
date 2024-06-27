@@ -1,9 +1,12 @@
 package me.Thelnfamous1.bettermobcombat.platform;
 
+import me.Thelnfamous1.bettermobcombat.BetterMobCombatCommon;
 import me.Thelnfamous1.bettermobcombat.network.BetterMobCombatForgeNetwork;
 import me.Thelnfamous1.bettermobcombat.network.S2CAttackAnimation;
+import me.Thelnfamous1.bettermobcombat.network.S2CConfigSync;
 import me.Thelnfamous1.bettermobcombat.platform.services.IPlatformHelper;
 import net.bettercombat.logic.AnimatedHand;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -44,5 +47,11 @@ public class ForgePlatformHelper implements IPlatformHelper {
     public void stopMobAttackAnimation(LivingEntity mob, int downWind) {
         S2CAttackAnimation packet = S2CAttackAnimation.stop(mob.getId(), downWind);
         BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob), packet);
+    }
+
+    @Override
+    public void updateServerConfig(ServerPlayer player) {
+        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
+                new S2CConfigSync(BetterMobCombatCommon.getServerConfigSerialized()));
     }
 }

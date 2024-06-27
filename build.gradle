@@ -72,7 +72,10 @@ subprojects {
                 "mod_id": mod_id,
                 "license": license,
                 "description": project.description,
+                "credits": credits,
                 "better_combat_version_range": better_combat_version_range,
+                "player_anim_version_range": player_anim_version_range,
+                "cloth_config_version_range": cloth_config_version_range,
                 "guard_villagers_version_range": guard_villagers_version_range
         ]
 

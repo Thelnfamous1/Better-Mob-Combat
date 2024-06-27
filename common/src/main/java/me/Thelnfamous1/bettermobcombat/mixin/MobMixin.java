@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import me.Thelnfamous1.bettermobcombat.BetterMobCombatCommon;
 import me.Thelnfamous1.bettermobcombat.Constants;
 import me.Thelnfamous1.bettermobcombat.api.client.BetterMobCombatClientEvents;
 import me.Thelnfamous1.bettermobcombat.client.collision.MobTargetFinder;
@@ -292,7 +293,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                 this.comboReset = Math.round(attackCooldownTicksFloat * BetterCombat.config.combo_reset_rate);
                 this.upswingTicks = Math.max(Math.round(attackCooldownTicksFloat * upswingRate), 1);
                 this.lastSwingDuration = attackCooldownTicksFloat;
-                this.setAttackCooldown(attackCooldownTicks);
+                this.setAttackCooldown(attackCooldownTicks + BetterMobCombatCommon.getServerConfig().mob_additional_attack_cooldown);
                 String animationName = hand.attack().animation();
                 boolean isOffHand = hand.isOffHand();
                 AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
