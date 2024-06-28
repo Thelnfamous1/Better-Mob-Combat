@@ -17,6 +17,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.IllagerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.AbstractIllager;
@@ -110,10 +111,21 @@ public abstract class IllagerModelMixin<T extends AbstractIllager> extends Hiera
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void initBendableStuff(ModelPart root, CallbackInfo ci){
-        IMutableModel thisWithMixin = (IMutableModel) this;
+        // Copied from PlayerAnimator's BipedEntityModelMixin#initBend
+        IBendHelper.INSTANCE.initBend(root.getChild("body"), Direction.DOWN);
+        IBendHelper.INSTANCE.initBend(root.getChild("right_arm"), Direction.UP);
+        IBendHelper.INSTANCE.initBend(root.getChild("left_arm"), Direction.UP);
+        IBendHelper.INSTANCE.initBend(root.getChild("right_leg"), Direction.UP);
+        IBendHelper.INSTANCE.initBend(root.getChild("left_leg"), Direction.UP);
+        ((IUpperPartHelper)(Object)rightArm).setUpperPart(true);
+        ((IUpperPartHelper)(Object)leftArm).setUpperPart(true);
+        ((IUpperPartHelper)(Object)head).setUpperPart(true);
+        ((IUpperPartHelper)(Object)hat).setUpperPart(true);
+
+        // Copied from PlayerAnimator's PlayerModelMixin#initBendableStuff
         bettermobcombat$emoteSupplier.set(null);
 
-        thisWithMixin.setEmoteSupplier(bettermobcombat$emoteSupplier);
+        this.setEmoteSupplier(bettermobcombat$emoteSupplier);
 
         // IllagerModel does not store the "body" ModelPart as a field
         this.bettermobcombat$body = root.getChild("body");
