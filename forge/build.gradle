@@ -81,12 +81,14 @@ repositories {
     maven { url 'https://maven.kosmx.dev/' }
     maven { url 'https://maven.shedaniel.me/' }
     maven { url = "https://api.modrinth.com/maven" }
+    maven { url 'https://maven.fabricmc.net/'}
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly project(":common")
-    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
+    //annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
+    annotationProcessor 'net.fabricmc:sponge-mixin:0.13.4+mixin.0.8.5'
 
     implementation fg.deobf("maven.modrinth:better-combat:${project.better_combat_version}-forge")
     // Better Combat Dependencies
