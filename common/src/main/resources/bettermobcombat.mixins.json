@@ -16,10 +16,11 @@
   ],
   "client": [
     "client.AbstractZombieModelMixin",
+    "client.EntityRenderDispatcherMixin",
     "client.EntityModelMixin",
+    "client.HierarchicalModelMixin",
     "client.HumanoidMobRendererMixin",
     "client.HumanoidModelMixin",
-    "client.HierarchicalModelMixin",
     "client.IllagerModelMixin",
     "client.LivingEntityRendererMixin",
     "client.MobMixinClient_bettercombat",

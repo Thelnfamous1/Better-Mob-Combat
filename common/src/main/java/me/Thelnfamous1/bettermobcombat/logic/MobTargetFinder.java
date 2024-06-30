@@ -34,7 +34,7 @@ public class MobTargetFinder {
     public static TargetFinder.TargetResult findAttackTargetResult(LivingEntity mob, @Nullable Entity cursorTarget, WeaponAttributes.Attack attack, double attackRange) {
         Vec3 origin = getInitialTracingPoint(mob);
         List<Entity> entities = getInitialTargets(mob, cursorTarget, attackRange);
-        if (!AttackRangeExtensions.sources().isEmpty()) {
+        if (!MobAttackRangeExtensions.sources().isEmpty()) {
             attackRange = applyAttackRangeModifiers(mob, attackRange);
         }
 

@@ -53,4 +53,9 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     }
 
+    @Override
+    public void syncMobComboCount(LivingEntity mob, int comboCount) {
+
+    }
+
 }

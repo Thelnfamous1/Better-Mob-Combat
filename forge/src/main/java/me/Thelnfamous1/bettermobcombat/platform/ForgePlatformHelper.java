@@ -1,10 +1,7 @@
 package me.Thelnfamous1.bettermobcombat.platform;
 
 import me.Thelnfamous1.bettermobcombat.BetterMobCombatCommon;
-import me.Thelnfamous1.bettermobcombat.network.BetterMobCombatForgeNetwork;
-import me.Thelnfamous1.bettermobcombat.network.S2CAttackAnimation;
-import me.Thelnfamous1.bettermobcombat.network.S2CAttackSound;
-import me.Thelnfamous1.bettermobcombat.network.S2CConfigSync;
+import me.Thelnfamous1.bettermobcombat.network.*;
 import me.Thelnfamous1.bettermobcombat.platform.services.IPlatformHelper;
 import net.bettercombat.logic.AnimatedHand;
 import net.minecraft.resources.ResourceKey;
@@ -43,14 +40,14 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public void playMobAttackAnimation(LivingEntity mob, AnimatedHand animatedHand, String animationName, float length, float upswing) {
-        S2CAttackAnimation packet = new S2CAttackAnimation(mob.getId(), animatedHand, animationName, length, upswing);
-        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob), packet);
+        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob),
+                new S2CAttackAnimation(mob.getId(), animatedHand, animationName, length, upswing));
     }
 
     @Override
     public void stopMobAttackAnimation(LivingEntity mob, int downWind) {
-        S2CAttackAnimation packet = S2CAttackAnimation.stop(mob.getId(), downWind);
-        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob), packet);
+        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob),
+                S2CAttackAnimation.stop(mob.getId(), downWind));
     }
 
     @Override
@@ -63,6 +60,12 @@ public class ForgePlatformHelper implements IPlatformHelper {
     public void playMobAttackSound(ServerLevel world, int mobId, double x, double y, double z, String soundId, float volume, float pitch, long seed, float distance, ResourceKey<Level> dimension) {
         BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.NEAR.with(() -> PacketDistributor.TargetPoint.p(x, y, z, distance, dimension).get()),
                 new S2CAttackSound(mobId, x, y, z, soundId, volume, pitch, seed));
+    }
+
+    @Override
+    public void syncMobComboCount(LivingEntity mob, int comboCount) {
+        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob),
+                new S2CComboCountSync(mob.getId(), comboCount));
     }
 
 }

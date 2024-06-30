@@ -389,7 +389,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
             double upswingRate = hand.upswingRate();
             if (!(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - upswingRate)) {
                 Entity cursorTarget = this.getTarget();
-                List<Entity> targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), cursorTarget, attack, hand.attributes().attackRange());
+                List<Entity> targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), null, attack, hand.attributes().attackRange());
                 this.bettermobcombat$updateTargetsInReach(targets);
                 if (targets.size() == 0) {
                     Constants.LOG.warn("Mob {} executed an attack with no targets in range", this);
@@ -473,6 +473,9 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
 
     @Override
     public void setComboCount(int comboCount) {
+        if(!this.level().isClientSide && this.bettermobcombat$comboCount != comboCount){
+            Services.PLATFORM.syncMobComboCount(this, comboCount);
+        }
         this.bettermobcombat$comboCount = comboCount;
     }
 

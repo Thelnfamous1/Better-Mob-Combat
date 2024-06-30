@@ -5,6 +5,7 @@ import me.Thelnfamous1.bettermobcombat.config.BMCServerConfig;
 import net.bettercombat.client.BetterCombatClient;
 import net.bettercombat.client.animation.PlayerAttackAnimatable;
 import net.bettercombat.logic.AnimatedHand;
+import net.bettercombat.logic.PlayerAttackProperties;
 import net.bettercombat.network.Packets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -12,6 +13,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 
 public class BetterMobCombatNetworkClient {
     static void handleAttackAnimation(int mobId, String animationName, float length, AnimatedHand animatedHand, float upswing) {
@@ -43,6 +45,13 @@ public class BetterMobCombatNetworkClient {
             Minecraft.getInstance().level.playLocalSound(x, y, z, soundEvent, entity.getSoundSource(), volume, pitch, true);
         } catch (Exception var5) {
             var5.printStackTrace();
+        }
+    }
+
+    public static void handleComboSync(int mobId, int comboCount) {
+        Entity entity = Minecraft.getInstance().level.getEntity(mobId);
+        if(entity instanceof Mob mob){
+            ((PlayerAttackProperties)mob).setComboCount(comboCount);
         }
     }
 }
