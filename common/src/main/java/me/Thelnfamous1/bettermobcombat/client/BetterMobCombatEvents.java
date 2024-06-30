@@ -1,4 +1,4 @@
-package me.Thelnfamous1.bettermobcombat.api.client;
+package me.Thelnfamous1.bettermobcombat.client;
 
 import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.event.Publisher;
@@ -8,11 +8,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class BetterMobCombatClientEvents {
+public class BetterMobCombatEvents {
     public static final Publisher<MobAttackStart> ATTACK_START = new Publisher<>();
     public static final Publisher<MobAttackHit> ATTACK_HIT = new Publisher<>();
 
-    public BetterMobCombatClientEvents() {
+    public BetterMobCombatEvents() {
     }
 
     @FunctionalInterface

@@ -1,6 +1,6 @@
 package me.Thelnfamous1.bettermobcombat.compatibility;
 
-import me.Thelnfamous1.bettermobcombat.api.client.MobAttackRangeExtensions;
+import me.Thelnfamous1.bettermobcombat.api.MobAttackRangeExtensions;
 import net.bettercombat.Platform;
 import net.bettercombat.api.client.AttackRangeExtensions;
 import net.bettercombat.api.client.AttackRangeExtensions.Operation;

@@ -1,6 +1,6 @@
 package me.Thelnfamous1.bettermobcombat.mixin;
 
-import me.Thelnfamous1.bettermobcombat.logic.MobAttackWindup;
+import me.Thelnfamous1.bettermobcombat.api.MobAttackWindup;
 import me.Thelnfamous1.bettermobcombat.logic.MobCombatHelper;
 import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.EntityPlayer_BetterCombat;

@@ -1,6 +1,7 @@
 package me.Thelnfamous1.bettermobcombat;
 
-import me.Thelnfamous1.bettermobcombat.api.client.BetterMobCombatClientEvents;
+import me.Thelnfamous1.bettermobcombat.client.BetterMobCombatEvents;
+import me.Thelnfamous1.bettermobcombat.compatibility.BMCCompatibilityFlags;
 import me.Thelnfamous1.bettermobcombat.config.BMCServerConfig;
 import me.Thelnfamous1.bettermobcombat.config.BMCServerConfigWrapper;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
@@ -37,8 +38,10 @@ public class BetterMobCombatCommon {
         AutoConfig.register(BMCServerConfigWrapper.class, PartitioningSerializer.wrap(JanksonConfigSerializer::new));
         updateServerConfig(AutoConfig.getConfigHolder(BMCServerConfigWrapper.class).getConfig().server, false);
 
-        BetterMobCombatClientEvents.ATTACK_START.register((mob, attackHand) -> debugTriggeredAttack(mob, attackHand, MobAttackHelper::getAttackCooldownTicksCapped));
+        BetterMobCombatEvents.ATTACK_START.register((mob, attackHand) -> debugTriggeredAttack(mob, attackHand, MobAttackHelper::getAttackCooldownTicksCapped));
         BetterCombatClientEvents.ATTACK_START.register((player, attackHand) -> debugTriggeredAttack(player, attackHand, PlayerAttackHelper::getAttackCooldownTicksCapped));
+
+        BMCCompatibilityFlags.initialize();
     }
 
     private static <T extends LivingEntity> void debugTriggeredAttack(T entity, AttackHand attackHand, Function<T, Float> attackCooldownGetter) {

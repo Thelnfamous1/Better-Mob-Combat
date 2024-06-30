@@ -1,4 +1,4 @@
-package me.Thelnfamous1.bettermobcombat.minecraftApi;
+package me.Thelnfamous1.bettermobcombat.api;
 
 import dev.kosmx.playerAnim.api.IPlayer;
 import dev.kosmx.playerAnim.api.layered.AnimationStack;

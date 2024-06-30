@@ -3,7 +3,6 @@ package me.Thelnfamous1.bettermobcombat.logic;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import me.Thelnfamous1.bettermobcombat.Constants;
-import me.Thelnfamous1.bettermobcombat.client.collision.MobTargetFinder;
 import me.Thelnfamous1.bettermobcombat.mixin.MobAccessor;
 import me.Thelnfamous1.bettermobcombat.mixin.ServerNetworkAccessor;
 import net.bettercombat.BetterCombat;

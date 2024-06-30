@@ -1,5 +1,6 @@
 package me.Thelnfamous1.bettermobcombat.logic;
 
+import me.Thelnfamous1.bettermobcombat.api.MobAttackStrength;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.ComboState;

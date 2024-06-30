@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,12 +28,14 @@ public abstract class LivingEntityRendererMixin<
         super($$0);
     }
 
-    @Inject(method = "setupRotations", at = @At("TAIL"))
+    @Inject(method = "setupRotations", at = @At("RETURN"))
     private void post_setupRotations(T entity, PoseStack matrixStack, float $$2, float $$3, float tickDelta, CallbackInfo ci){
-        this.bettermobcombat$handleAnimationTick(entity, matrixStack, tickDelta);
+        if(entity instanceof Mob mob){
+            this.bettermobcombat$applyBodyRotations(mob, matrixStack, tickDelta);
+        }
     }
 
     @Unique
-    protected void bettermobcombat$handleAnimationTick(T entity, PoseStack matrixStack, float tickDelta) {
+    protected void bettermobcombat$applyBodyRotations(Mob entity, PoseStack matrixStack, float tickDelta) {
     }
 }

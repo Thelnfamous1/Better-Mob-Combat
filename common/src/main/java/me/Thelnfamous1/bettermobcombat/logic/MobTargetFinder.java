@@ -1,7 +1,6 @@
-package me.Thelnfamous1.bettermobcombat.client.collision;
+package me.Thelnfamous1.bettermobcombat.logic;
 
-import me.Thelnfamous1.bettermobcombat.api.client.MobAttackRangeExtensions;
-import me.Thelnfamous1.bettermobcombat.logic.MobTargetHelper;
+import me.Thelnfamous1.bettermobcombat.api.MobAttackRangeExtensions;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.api.client.AttackRangeExtensions;

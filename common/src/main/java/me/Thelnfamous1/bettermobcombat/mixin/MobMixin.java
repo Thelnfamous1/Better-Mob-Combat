@@ -6,10 +6,10 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.Thelnfamous1.bettermobcombat.BetterMobCombatCommon;
 import me.Thelnfamous1.bettermobcombat.Constants;
-import me.Thelnfamous1.bettermobcombat.api.client.BetterMobCombatClientEvents;
-import me.Thelnfamous1.bettermobcombat.client.collision.MobTargetFinder;
-import me.Thelnfamous1.bettermobcombat.logic.MobAttackStrength;
-import me.Thelnfamous1.bettermobcombat.logic.MobAttackWindup;
+import me.Thelnfamous1.bettermobcombat.client.BetterMobCombatEvents;
+import me.Thelnfamous1.bettermobcombat.logic.MobTargetFinder;
+import me.Thelnfamous1.bettermobcombat.api.MobAttackStrength;
+import me.Thelnfamous1.bettermobcombat.api.MobAttackWindup;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
 import me.Thelnfamous1.bettermobcombat.logic.MobCombatHelper;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
@@ -43,21 +43,21 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-@Mixin(Mob.class)
+@Mixin(value = Mob.class)
 public abstract class MobMixin extends LivingEntity implements EntityPlayer_BetterCombat, MobAttackStrength, MobAttackWindup, PlayerAttackProperties {
 
     @Unique
-    private int comboCount = 0;
+    private int bettermobcombat$comboCount = 0;
     @Unique
-    private Multimap<Attribute, AttributeModifier> dualWieldingAttributeMap;
+    private Multimap<Attribute, AttributeModifier> bettermobcombat$dualWieldingAttributeMap;
     @Unique
-    private static final UUID dualWieldingSpeedModifierId = UUID.fromString("6b364332-0dc4-11ed-861d-0242ac120002");
+    private static final UUID bettermobcombat$DUAL_WIELDING_SPEED_MODIFIER_ID = UUID.fromString("6b364332-0dc4-11ed-861d-0242ac120002");
     @Unique
-    private AttackHand lastAttack;
+    private AttackHand bettermobcombat$lastAttack;
     @Unique
-    private ItemStack lastItemInMainHand = ItemStack.EMPTY;
+    private ItemStack bettermobcombat$lastItemInMainHand = ItemStack.EMPTY;
     @Unique
-    private int attackCooldown;
+    private int bettermobcombat$attackCooldown;
 
     @Shadow
     @Nullable
@@ -67,19 +67,19 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     public abstract boolean doHurtTarget(Entity $$0);
 
     @Unique
-    private ItemStack upswingStack;
+    private ItemStack bettermobcombat$upswingStack;
     @Unique
-    private ItemStack lastAttackedWithItemStack;
+    private ItemStack bettermobcombat$lastAttackedWithItemStack;
     @Unique
-    private int upswingTicks = 0;
+    private int bettermobcombat$upswingTicks = 0;
     @Unique
-    private int lastAttacked = 1000;
+    private int bettermobcombat$lastAttacked = 1000;
     @Unique
-    private float lastSwingDuration = 0.0F;
+    private float bettermobcombat$lastSwingDuration = 0.0F;
     @Unique
-    private int comboReset = 0;
+    private int bettermobcombat$comboReset = 0;
     @Unique
-    private List<Entity> targetsInReach = null;
+    private List<Entity> bettermobcombat$targetsInReach = null;
 
     protected MobMixin(EntityType<? extends LivingEntity> $$0, Level $$1) {
         super($$0, $$1);
@@ -87,11 +87,11 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
 
     @Override
     public @Nullable AttackHand getCurrentAttack() {
-        if (this.comboCount < 0) {
+        if (this.bettermobcombat$comboCount < 0) {
             return null;
         } else {
             Mob player = (Mob) (Object) this;
-            return MobAttackHelper.getCurrentAttack(player, this.comboCount);
+            return MobAttackHelper.getCurrentAttack(player, this.bettermobcombat$comboCount);
         }
     }
 
@@ -136,17 +136,17 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
             ((PlayerAttackAnimatable) this).updateAnimationsOnTick();
         }
 
-        this.updateDualWieldingSpeedBoost();
+        this.bettermobcombat$updateDualWieldingSpeedBoost();
 
         // Copy of attack strength logic in Player#tick
         ++this.attackStrengthTicker;
         ItemStack itemstack = this.getMainHandItem();
-        if (!ItemStack.matches(this.lastItemInMainHand, itemstack)) {
-            if (!ItemStack.isSameItem(this.lastItemInMainHand, itemstack)) {
+        if (!ItemStack.matches(this.bettermobcombat$lastItemInMainHand, itemstack)) {
+            if (!ItemStack.isSameItem(this.bettermobcombat$lastItemInMainHand, itemstack)) {
                 this.bettercombat$resetAttackStrengthTicker();
             }
 
-            this.lastItemInMainHand = itemstack.copy();
+            this.bettermobcombat$lastItemInMainHand = itemstack.copy();
         }
     }
 
@@ -194,19 +194,19 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     }
 
     @Unique
-    private void updateDualWieldingSpeedBoost() {
+    private void bettermobcombat$updateDualWieldingSpeedBoost() {
         Mob mob = (Mob) (Object) this;
         boolean newState = MobAttackHelper.isDualWielding(mob);
-        boolean currentState = this.dualWieldingAttributeMap != null;
+        boolean currentState = this.bettermobcombat$dualWieldingAttributeMap != null;
         if (newState != currentState) {
             if (newState) {
-                this.dualWieldingAttributeMap = HashMultimap.create();
+                this.bettermobcombat$dualWieldingAttributeMap = HashMultimap.create();
                 double multiplier = BetterCombat.config.dual_wielding_attack_speed_multiplier - 1.0F;
-                this.dualWieldingAttributeMap.put(Attributes.ATTACK_SPEED, new AttributeModifier(dualWieldingSpeedModifierId, "Dual wielding attack speed boost", multiplier, AttributeModifier.Operation.MULTIPLY_BASE));
-                mob.getAttributes().addTransientAttributeModifiers(this.dualWieldingAttributeMap);
-            } else if (this.dualWieldingAttributeMap != null) {
-                mob.getAttributes().removeAttributeModifiers(this.dualWieldingAttributeMap);
-                this.dualWieldingAttributeMap = null;
+                this.bettermobcombat$dualWieldingAttributeMap.put(Attributes.ATTACK_SPEED, new AttributeModifier(bettermobcombat$DUAL_WIELDING_SPEED_MODIFIER_ID, "Dual wielding attack speed boost", multiplier, AttributeModifier.Operation.MULTIPLY_BASE));
+                mob.getAttributes().addTransientAttributeModifiers(this.bettermobcombat$dualWieldingAttributeMap);
+            } else if (this.bettermobcombat$dualWieldingAttributeMap != null) {
+                mob.getAttributes().removeAttributeModifiers(this.bettermobcombat$dualWieldingAttributeMap);
+                this.bettermobcombat$dualWieldingAttributeMap = null;
             }
         }
 
@@ -222,7 +222,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     )
     public ItemStack getHeldItem(ItemStack heldItem) {
         Mob mob = (Mob) (Object) this;
-        AttackHand currentHand = MobAttackHelper.getCurrentAttack(mob, this.comboCount);
+        AttackHand currentHand = MobAttackHelper.getCurrentAttack(mob, this.bettermobcombat$comboCount);
         if (currentHand != null) {
             return currentHand.isOffHand() ? mob.getOffhandItem() : heldItem;
         } else {
@@ -238,15 +238,15 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
             )
     )
     public ItemStack getMainHandStack_Redirect(Mob instance, Operation<ItemStack> original) {
-        if (this.comboCount < 0) {
+        if (this.bettermobcombat$comboCount < 0) {
             return original.call(instance);
         } else {
-            AttackHand hand = MobAttackHelper.getCurrentAttack(instance, this.comboCount);
+            AttackHand hand = MobAttackHelper.getCurrentAttack(instance, this.bettermobcombat$comboCount);
             if (hand == null) {
-                boolean isOffHand = MobAttackHelper.shouldAttackWithOffHand(instance, this.comboCount);
+                boolean isOffHand = MobAttackHelper.shouldAttackWithOffHand(instance, this.bettermobcombat$comboCount);
                 return isOffHand ? ItemStack.EMPTY : original.call(instance);
             } else {
-                this.lastAttack = hand;
+                this.bettermobcombat$lastAttack = hand;
                 return hand.itemStack();
             }
         }
@@ -281,24 +281,24 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
 
     @Override
     public void bettermobcombat$startUpswing(WeaponAttributes attributes) {
-        AttackHand hand = this.getCurrentHand();
+        AttackHand hand = this.bettermobcombat$getCurrentHand();
         if (hand != null) {
             float upswingRate = (float) hand.upswingRate();
-            if (this.upswingTicks <= 0 && this.attackCooldown <= 0 && !this.isUsingItem() && !(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - (double) upswingRate)) {
+            if (this.bettermobcombat$upswingTicks <= 0 && this.bettermobcombat$attackCooldown <= 0 && !this.isUsingItem() && !(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - (double) upswingRate)) {
                 this.releaseUsingItem();
-                this.lastAttacked = 0;
-                this.upswingStack = this.getMainHandItem();
+                this.bettermobcombat$lastAttacked = 0;
+                this.bettermobcombat$upswingStack = this.getMainHandItem();
                 float attackCooldownTicksFloat = MobAttackHelper.getAttackCooldownTicksCapped(((Mob) (Object) this));
                 int attackCooldownTicks = Math.round(attackCooldownTicksFloat);
-                this.comboReset = Math.round(attackCooldownTicksFloat * BetterCombat.config.combo_reset_rate);
-                this.upswingTicks = Math.max(Math.round(attackCooldownTicksFloat * upswingRate), 1);
-                this.lastSwingDuration = attackCooldownTicksFloat;
-                this.setAttackCooldown(attackCooldownTicks + BetterMobCombatCommon.getServerConfig().mob_additional_attack_cooldown);
+                this.bettermobcombat$comboReset = Math.round(attackCooldownTicksFloat * BetterCombat.config.combo_reset_rate);
+                this.bettermobcombat$upswingTicks = Math.max(Math.round(attackCooldownTicksFloat * upswingRate), 1);
+                this.bettermobcombat$lastSwingDuration = attackCooldownTicksFloat;
+                this.bettermobcombat$setAttackCooldown(attackCooldownTicks + BetterMobCombatCommon.getServerConfig().mob_additional_attack_cooldown);
                 String animationName = hand.attack().animation();
                 boolean isOffHand = hand.isOffHand();
                 AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
                 Services.PLATFORM.playMobAttackAnimation(this, animatedHand, animationName, attackCooldownTicksFloat, upswingRate);
-                BetterMobCombatClientEvents.ATTACK_START.invoke((handler) -> {
+                BetterMobCombatEvents.ATTACK_START.invoke((handler) -> {
                     handler.onMobAttackStart(((Mob)(Object)this), hand);
                 });
             }
@@ -308,49 +308,49 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     }
 
     @Unique
-    private void cancelSwingIfNeeded() {
-        if (this.upswingStack != null && !areItemStackEqual(this.getMainHandItem(), this.upswingStack)) {
-            this.cancelWeaponSwing();
+    private void bettermobcombat$cancelSwingIfNeeded() {
+        if (this.bettermobcombat$upswingStack != null && !bettermobcombat$areItemStackEqual(this.getMainHandItem(), this.bettermobcombat$upswingStack)) {
+            this.bettermobcombat$cancelWeaponSwing();
         }
     }
 
     @Unique
-    private void attackFromUpswingIfNeeded() {
-        if (this.upswingTicks > 0) {
-            --this.upswingTicks;
-            if (this.upswingTicks == 0) {
-                this.performAttack();
-                this.upswingStack = null;
+    private void bettermobcombat$attackFromUpswingIfNeeded() {
+        if (this.bettermobcombat$upswingTicks > 0) {
+            --this.bettermobcombat$upswingTicks;
+            if (this.bettermobcombat$upswingTicks == 0) {
+                this.bettermobcombat$performAttack();
+                this.bettermobcombat$upswingStack = null;
             }
         }
 
     }
 
     @Unique
-    private void resetComboIfNeeded() {
-        if (this.lastAttacked > this.comboReset && this.getComboCount() > 0) {
+    private void bettermobcombat$resetComboIfNeeded() {
+        if (this.bettermobcombat$lastAttacked > this.bettermobcombat$comboReset && this.getComboCount() > 0) {
             this.setComboCount(0);
         }
 
-        if (!MobAttackHelper.shouldAttackWithOffHand(((Mob) (Object) this), this.getComboCount()) && (this.getMainHandItem() == null || this.lastAttackedWithItemStack != null && !this.lastAttackedWithItemStack.getItem().equals(this.getMainHandItem().getItem()))) {
+        if (!MobAttackHelper.shouldAttackWithOffHand(((Mob) (Object) this), this.getComboCount()) && (this.getMainHandItem() == null || this.bettermobcombat$lastAttackedWithItemStack != null && !this.bettermobcombat$lastAttackedWithItemStack.getItem().equals(this.getMainHandItem().getItem()))) {
             this.setComboCount(0);
         }
 
     }
 
     @Unique
-    private boolean shouldUpdateTargetsInReach() {
-        return !this.level().isClientSide && this.getTarget() != null && this.targetsInReach == null;
+    private boolean bettermobcombat$shouldUpdateTargetsInReach() {
+        return !this.level().isClientSide && this.getTarget() != null && this.bettermobcombat$targetsInReach == null;
     }
 
     @Unique
-    private void updateTargetsInReach(List<Entity> targets) {
-        this.targetsInReach = targets;
+    private void bettermobcombat$updateTargetsInReach(List<Entity> targets) {
+        this.bettermobcombat$targetsInReach = targets;
     }
 
     @Unique
-    private void updateTargetsIfNeeded() {
-        if (this.shouldUpdateTargetsInReach()) {
+    private void bettermobcombat$updateTargetsIfNeeded() {
+        if (this.bettermobcombat$shouldUpdateTargetsInReach()) {
             AttackHand hand = MobAttackHelper.getCurrentAttack(this, this.getComboCount());
             WeaponAttributes attributes = WeaponRegistry.getAttributes(this.getMainHandItem());
             List<Entity> targets = List.of();
@@ -358,7 +358,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                 targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), this.getTarget(), hand.attack(), attributes.attackRange());
             }
 
-            this.updateTargetsInReach(targets);
+            this.bettermobcombat$updateTargetsInReach(targets);
         }
 
     }
@@ -369,28 +369,28 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     )
     private void pre_Tick(CallbackInfo ci) {
         if (!this.level().isClientSide) {
-            if (this.attackCooldown > 0) {
-                --this.attackCooldown;
+            if (this.bettermobcombat$attackCooldown > 0) {
+                --this.bettermobcombat$attackCooldown;
             }
-            this.targetsInReach = null;
-            ++this.lastAttacked;
-            this.cancelSwingIfNeeded();
-            this.attackFromUpswingIfNeeded();
-            this.updateTargetsIfNeeded();
-            this.resetComboIfNeeded();
+            this.bettermobcombat$targetsInReach = null;
+            ++this.bettermobcombat$lastAttacked;
+            this.bettermobcombat$cancelSwingIfNeeded();
+            this.bettermobcombat$attackFromUpswingIfNeeded();
+            this.bettermobcombat$updateTargetsIfNeeded();
+            this.bettermobcombat$resetComboIfNeeded();
         }
     }
 
     @Unique
-    private void performAttack() {
-        AttackHand hand = this.getCurrentHand();
+    private void bettermobcombat$performAttack() {
+        AttackHand hand = this.bettermobcombat$getCurrentHand();
         if (hand != null) {
             WeaponAttributes.Attack attack = hand.attack();
             double upswingRate = hand.upswingRate();
             if (!(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - upswingRate)) {
                 Entity cursorTarget = this.getTarget();
                 List<Entity> targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), cursorTarget, attack, hand.attributes().attackRange());
-                this.updateTargetsInReach(targets);
+                this.bettermobcombat$updateTargetsInReach(targets);
                 if (targets.size() == 0) {
                     Constants.LOG.warn("Mob {} executed an attack with no targets in range", this);
                     // PlatformClient.onEmptyLeftClick(((Mob)(Object)this));
@@ -399,12 +399,12 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                 MobCombatHelper.processAttack(this.level(), ((Mob) (Object) this), this.getComboCount(), targets);
 
                 this.bettercombat$resetAttackStrengthTicker();
-                BetterMobCombatClientEvents.ATTACK_HIT.invoke((handler) -> {
+                BetterMobCombatEvents.ATTACK_HIT.invoke((handler) -> {
                     handler.onMobAttackHit(((Mob)(Object)this), hand, targets, cursorTarget);
                 });
                 this.setComboCount(this.getComboCount() + 1);
                 if (!hand.isOffHand()) {
-                    this.lastAttackedWithItemStack = hand.itemStack();
+                    this.bettermobcombat$lastAttackedWithItemStack = hand.itemStack();
                 }
 
             }
@@ -412,12 +412,12 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     }
 
     @Unique
-    private AttackHand getCurrentHand() {
+    private AttackHand bettermobcombat$getCurrentHand() {
         return MobAttackHelper.getCurrentAttack(((Mob) (Object) this), this.getComboCount());
     }
 
     @Unique
-    private static boolean areItemStackEqual(ItemStack left, ItemStack right) {
+    private static boolean bettermobcombat$areItemStackEqual(ItemStack left, ItemStack right) {
         if (left == null && right == null) {
             return true;
         } else {
@@ -427,53 +427,53 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
 
     @Override
     public int bettermobcombat$getAttackCooldown(){
-        return this.attackCooldown;
+        return this.bettermobcombat$attackCooldown;
     }
 
     @Unique
-    private void setAttackCooldown(int ticks) {
-        this.attackCooldown = ticks;
+    private void bettermobcombat$setAttackCooldown(int ticks) {
+        this.bettermobcombat$attackCooldown = ticks;
     }
 
     @Unique
-    private void cancelWeaponSwing() {
+    private void bettermobcombat$cancelWeaponSwing() {
         int downWind = (int) Math.round((double) MobAttackHelper.getAttackCooldownTicksCapped(((Mob) (Object) this)) * (1.0 - 0.5 * (double) BetterCombat.config.upswing_multiplier));
         Services.PLATFORM.stopMobAttackAnimation(this, downWind);
-        this.upswingStack = null;
-        this.setAttackCooldown(0);
+        this.bettermobcombat$upswingStack = null;
+        this.bettermobcombat$setAttackCooldown(0);
     }
 
     @Unique
-    public boolean hasTargetsInReach() {
-        return this.targetsInReach != null && !this.targetsInReach.isEmpty();
+    public boolean bettermobcombat$hasTargetsInReach() {
+        return this.bettermobcombat$targetsInReach != null && !this.bettermobcombat$targetsInReach.isEmpty();
     }
 
     @Override
     public float bettermobcombat$getSwingProgress() {
-        return !((float) this.lastAttacked > this.lastSwingDuration) && !(this.lastSwingDuration <= 0.0F) ? (float) this.lastAttacked / this.lastSwingDuration : 1.0F;
+        return !((float) this.bettermobcombat$lastAttacked > this.bettermobcombat$lastSwingDuration) && !(this.bettermobcombat$lastSwingDuration <= 0.0F) ? (float) this.bettermobcombat$lastAttacked / this.bettermobcombat$lastSwingDuration : 1.0F;
     }
 
     @Override
     public int bettermobcombat$getUpswingTicks() {
-        return this.upswingTicks;
+        return this.bettermobcombat$upswingTicks;
     }
 
     @Override
     public void bettermobcombat$cancelUpswing() {
-        if (this.upswingTicks > 0) {
-            this.cancelWeaponSwing();
+        if (this.bettermobcombat$upswingTicks > 0) {
+            this.bettermobcombat$cancelWeaponSwing();
         }
 
     }
 
     @Override
     public int getComboCount() {
-        return this.comboCount;
+        return this.bettermobcombat$comboCount;
     }
 
     @Override
     public void setComboCount(int comboCount) {
-        this.comboCount = comboCount;
+        this.bettermobcombat$comboCount = comboCount;
     }
 
     @Inject(method = "isWithinMeleeAttackRange", at = @At("HEAD"), cancellable = true)

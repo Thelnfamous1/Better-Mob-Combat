@@ -7,12 +7,12 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.kosmx.playerAnim.core.impl.AnimationProcessor;
 import dev.kosmx.playerAnim.core.util.SetableSupplier;
 import dev.kosmx.playerAnim.impl.Helper;
-import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import dev.kosmx.playerAnim.impl.IMutableModel;
+import dev.kosmx.playerAnim.impl.IPlayerModel;
 import dev.kosmx.playerAnim.impl.IUpperPartHelper;
 import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
 import dev.kosmx.playerAnim.impl.animation.IBendHelper;
-import me.Thelnfamous1.bettermobcombat.api.client.MobPlayerModel;
+import me.Thelnfamous1.bettermobcombat.client.MobModelHelper;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.IllagerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -21,7 +21,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.AbstractIllager;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.function.Function;
 
 @Mixin(value = IllagerModel.class, priority = 2000)
-public abstract class IllagerModelMixin<T extends AbstractIllager> extends HierarchicalModelMixin<T> implements MobPlayerModel, IMutableModel {
+public abstract class IllagerModelMixin<T extends AbstractIllager> extends HierarchicalModelMixin<T> implements IPlayerModel, IMutableModel {
     @Shadow @Final private ModelPart head;
     @Shadow @Final private ModelPart hat;
     @Shadow @Final private ModelPart leftArm;
@@ -93,12 +96,12 @@ public abstract class IllagerModelMixin<T extends AbstractIllager> extends Hiera
     }
 
     @Unique
-    protected Iterable<ModelPart> bettermobcombat$headParts() {
+    private Iterable<ModelPart> bettermobcombat$headParts() {
         return ImmutableList.of(this.head);
     }
 
     @Unique
-    protected Iterable<ModelPart> bettermobcombat$bodyParts() {
+    private Iterable<ModelPart> bettermobcombat$bodyParts() {
         return ImmutableList.of(this.bettermobcombat$body, this.rightArm, this.leftArm, this.rightLeg, this.leftLeg, this.hat);
     }
 
@@ -141,20 +144,20 @@ public abstract class IllagerModelMixin<T extends AbstractIllager> extends Hiera
                                                    float $$3,
                                                    float $$4,
                                                    float $$5) {
-        return !MobPlayerModel.bettermobcombat$isAnimating(illager);
+        return !MobModelHelper.isAnimating(illager);
     }
 
     @WrapWithCondition(method = "setupAnim",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/AnimationUtils;swingWeaponDown(Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/client/model/geom/ModelPart;Lnet/minecraft/world/entity/Mob;FF)V")
     )
     private boolean onlyAnimateWeaponSwingIfAllowed(ModelPart rightArm, ModelPart leftArm, Mob mob, float attackTime, float bob) {
-        return !MobPlayerModel.bettermobcombat$isAnimating(mob);
+        return !MobModelHelper.isAnimating(mob);
     }
 
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/monster/AbstractIllager;FFFFF)V", at = @At("TAIL"))
     private void setEmote(T illager, float $$1, float $$2, float $$3, float $$4, float $$5, CallbackInfo ci){
-        if(!bettermobcombat$firstPersonNext && ((IAnimatedPlayer)illager).playerAnimator_getAnimation().isActive()){
-            AnimationApplier emote = ((IAnimatedPlayer) illager).playerAnimator_getAnimation();
+        if(!bettermobcombat$firstPersonNext && MobModelHelper.isAnimating(illager)){
+            AnimationApplier emote = MobModelHelper.getAnimation(illager);
             bettermobcombat$emoteSupplier.set(emote);
 
             emote.updatePart("head", this.head);
@@ -171,11 +174,11 @@ public abstract class IllagerModelMixin<T extends AbstractIllager> extends Hiera
         else {
             bettermobcombat$firstPersonNext = false;
             bettermobcombat$emoteSupplier.set(null);
-            MobPlayerModel.bettermobcombat$resetBend(this.bettermobcombat$body);
-            MobPlayerModel.bettermobcombat$resetBend(this.leftArm);
-            MobPlayerModel.bettermobcombat$resetBend(this.rightArm);
-            MobPlayerModel.bettermobcombat$resetBend(this.leftLeg);
-            MobPlayerModel.bettermobcombat$resetBend(this.rightLeg);
+            MobModelHelper.resetBend(this.bettermobcombat$body);
+            MobModelHelper.resetBend(this.leftArm);
+            MobModelHelper.resetBend(this.rightArm);
+            MobModelHelper.resetBend(this.leftLeg);
+            MobModelHelper.resetBend(this.rightLeg);
         }
     }
 

@@ -1,4 +1,4 @@
-package me.Thelnfamous1.bettermobcombat.logic;
+package me.Thelnfamous1.bettermobcombat.api;
 
 import net.bettercombat.api.WeaponAttributes;
 

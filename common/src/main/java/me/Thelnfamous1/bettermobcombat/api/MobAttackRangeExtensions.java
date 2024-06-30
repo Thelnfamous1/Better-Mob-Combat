@@ -1,4 +1,4 @@
-package me.Thelnfamous1.bettermobcombat.api.client;
+package me.Thelnfamous1.bettermobcombat.api;
 
 import java.util.ArrayList;
 import java.util.List;

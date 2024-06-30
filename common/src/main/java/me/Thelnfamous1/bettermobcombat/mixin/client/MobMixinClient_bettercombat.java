@@ -11,10 +11,8 @@ import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
-import dev.kosmx.playerAnim.impl.animation.AnimationApplier;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
-import me.Thelnfamous1.bettermobcombat.minecraftApi.MobAnimationAccess;
-import me.Thelnfamous1.bettermobcombat.minecraftApi.MobAnimationFactory;
+import me.Thelnfamous1.bettermobcombat.api.MobAttackWindup;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.WeaponAttributes;
@@ -25,7 +23,7 @@ import net.bettercombat.client.animation.modifier.TransmissionSpeedModifier;
 import net.bettercombat.compatibility.CompatibilityFlags;
 import net.bettercombat.logic.AnimatedHand;
 import net.bettercombat.logic.WeaponRegistry;
-import net.minecraft.resources.ResourceLocation;
+import net.bettercombat.utils.MathHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,8 +32,6 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -43,116 +39,58 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-@Mixin(Mob.class)
-public abstract class MobMixinClient extends LivingEntity implements PlayerAttackAnimatable, IAnimatedPlayer {
+@Mixin(value = Mob.class)
+public abstract class MobMixinClient_bettercombat extends LivingEntity implements PlayerAttackAnimatable, IAnimatedPlayer {
     @Shadow public abstract boolean isLeftHanded();
-    @Unique
-    private final Map<ResourceLocation, IAnimation> modAnimationData = new HashMap<>();
-    @Unique
-    private final AnimationStack animationStack = createAnimationStack();
-    @Unique
-    private final AnimationApplier animationApplier = new AnimationApplier(animationStack);
 
     @Unique
-    private final AttackAnimationSubStack attackAnimation = new AttackAnimationSubStack(this.createAttackAdjustment());
+    private final AttackAnimationSubStack bettermobcombat$attackAnimation = new AttackAnimationSubStack(this.bettermobcombat$createAttackAdjustment());
     @Unique
-    private final PoseSubStack mainHandBodyPose = new PoseSubStack(this.createPoseAdjustment(), true, true);
+    private final PoseSubStack bettermobcombat$mainHandBodyPose = new PoseSubStack(this.bettermobcombat$createPoseAdjustment(), true, true);
     @Unique
-    private final PoseSubStack mainHandItemPose = new PoseSubStack(null, false, true);
+    private final PoseSubStack bettermobcombat$mainHandItemPose = new PoseSubStack(null, false, true);
     @Unique
-    private final PoseSubStack offHandBodyPose = new PoseSubStack(null, true, false);
+    private final PoseSubStack bettermobcombat$offHandBodyPose = new PoseSubStack(null, true, false);
     @Unique
-    private final PoseSubStack offHandItemPose = new PoseSubStack(null, false, true);
-    protected MobMixinClient(EntityType<? extends Mob> $$0, Level $$1) {
+    private final PoseSubStack bettermobcombat$offHandItemPose = new PoseSubStack(null, false, true);
+    protected MobMixinClient_bettercombat(EntityType<? extends Mob> $$0, Level $$1) {
         super($$0, $$1);
     }
 
-    @SuppressWarnings("ConstantConditions")
-    @Unique
-    private AnimationStack createAnimationStack() {
-        AnimationStack stack = new AnimationStack();
-        if (this.level().isClientSide) {
-            MobAnimationFactory.ANIMATION_DATA_FACTORY.prepareAnimations((Mob) (Object) this, stack, modAnimationData);
-            MobAnimationAccess.REGISTER_ANIMATION_EVENT.invoker().registerAnimation((Mob)(Object) this, stack);
-        }
-        return stack;
-    }
-
-    @Override
-    public AnimationStack getAnimationStack() {
-        return animationStack;
-    }
-
-    @Override
-    public AnimationApplier playerAnimator_getAnimation() {
-        return animationApplier;
-    }
-
-    @Override
-    public @Nullable IAnimation playerAnimator_getAnimation(@NotNull ResourceLocation id) {
-        return modAnimationData.get(id);
-    }
-
-    @Override
-    public @Nullable IAnimation playerAnimator_setAnimation(@NotNull ResourceLocation id, @Nullable IAnimation animation) {
-        if (animation == null) {
-            return modAnimationData.remove(id);
-        } else {
-            return modAnimationData.put(id, animation);
-        }
-    }
-
-    @Inject(method = "tick", at = @At("HEAD"))
-    private void tick(CallbackInfo ci) {
-        if (this.level().isClientSide) {
-            animationStack.tick();
-        }
-    }
-
-    /*
     @Inject(
             method = {"aiStep"},
             at = {@At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/input/Input;tick(ZF)V",
-                    shift = At.Shift.AFTER
+                    target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V"
             )}
     )
     private void tickMovement_ModifyInput(CallbackInfo ci) {
-        ServerConfig config = BetterCombat.config;
-        double multiplier = Math.min(Math.max((double)config.movement_speed_while_attacking, 0.0), 1.0);
+        double multiplier = Math.min(Math.max(BetterCombat.config.movement_speed_while_attacking, 0.0), 1.0);
         if (multiplier != 1.0) {
-            LocalPlayer clientPlayer = (LocalPlayer)this;
-            if (!clientPlayer.isPassenger() || config.movement_speed_effected_while_mounting) {
-                MinecraftClient_BetterCombat client = (MinecraftClient_BetterCombat) Minecraft.getInstance();
-                float swingProgress = client.getSwingProgress();
+            if (!this.isPassenger() || BetterCombat.config.movement_speed_effected_while_mounting) {
+                float swingProgress = ((MobAttackWindup) this).bettermobcombat$getSwingProgress();
                 if ((double)swingProgress < 0.98) {
-                    if (config.movement_speed_applied_smoothly) {
-                        double p2 = 0.0;
+                    if (BetterCombat.config.movement_speed_applied_smoothly) {
+                        double p2;
                         if ((double)swingProgress <= 0.5) {
-                            p2 = MathHelper.easeOutCubic((double)(swingProgress * 2.0F));
+                            p2 = MathHelper.easeOutCubic(swingProgress * 2.0F);
                         } else {
                             p2 = MathHelper.easeOutCubic(1.0 - ((double)swingProgress - 0.5) * 2.0);
                         }
 
-                        multiplier = (double)((float)(1.0 - (1.0 - multiplier) * p2));
+                        multiplier = (float)(1.0 - (1.0 - multiplier) * p2);
                     }
 
-                    Input var10000 = clientPlayer.input;
-                    var10000.forwardImpulse = (float)((double)var10000.forwardImpulse * multiplier);
-                    var10000 = clientPlayer.input;
-                    var10000.leftImpulse = (float)((double)var10000.leftImpulse * multiplier);
+                    this.zza *= multiplier;
+                    this.xxa *= multiplier;
                 }
 
             }
         }
     }
-     */
 
     @Inject(
             method = {"<init>"},
@@ -160,26 +98,25 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
     )
     private void postInit(EntityType<?> $$0, Level $$1, CallbackInfo ci) {
         AnimationStack stack = this.getAnimationStack();
-        stack.addAnimLayer(1, this.offHandItemPose.base);
-        stack.addAnimLayer(2, this.offHandBodyPose.base);
-        stack.addAnimLayer(3, this.mainHandItemPose.base);
-        stack.addAnimLayer(4, this.mainHandBodyPose.base);
-        stack.addAnimLayer(2000, this.attackAnimation.base);
-        this.mainHandBodyPose.configure = this::updateAnimationByCurrentActivity;
-        this.offHandBodyPose.configure = this::updateAnimationByCurrentActivity;
+        stack.addAnimLayer(1, this.bettermobcombat$offHandItemPose.base);
+        stack.addAnimLayer(2, this.bettermobcombat$offHandBodyPose.base);
+        stack.addAnimLayer(3, this.bettermobcombat$mainHandItemPose.base);
+        stack.addAnimLayer(4, this.bettermobcombat$mainHandBodyPose.base);
+        stack.addAnimLayer(2000, this.bettermobcombat$attackAnimation.base);
+        this.bettermobcombat$mainHandBodyPose.configure = this::bettermobcombat$updateAnimationByCurrentActivity;
+        this.bettermobcombat$offHandBodyPose.configure = this::bettermobcombat$updateAnimationByCurrentActivity;
     }
 
     @Override
     public void updateAnimationsOnTick() {
-        Mob mob = (Mob) (Object) this;
         boolean isLeftHanded = this.isLeftHanded();
-        boolean hasActiveAttackAnimation = this.attackAnimation.base.getAnimation() != null && this.attackAnimation.base.getAnimation().isActive();
-        ItemStack mainHandStack = mob.getMainHandItem();
-        if (!mob.swinging && !mob.isSwimming() && !mob.isUsingItem() && !Services.PLATFORM.isCastingSpell(mob) && !CrossbowItem.isCharged(mainHandStack)) {
+        boolean hasActiveAttackAnimation = this.bettermobcombat$attackAnimation.base.getAnimation() != null && this.bettermobcombat$attackAnimation.base.getAnimation().isActive();
+        ItemStack mainHandStack = this.getMainHandItem();
+        if (!this.swinging && !this.isSwimming() && !this.isUsingItem() && !Services.PLATFORM.isCastingSpell(this) && !CrossbowItem.isCharged(mainHandStack)) {
             if (hasActiveAttackAnimation) {
                 // Mobs override LivingEntity#tickHeadTurn to tick their body controller instead
                 //((LivingEntityAccessor) mob).invokeTurnHead(mob.getYHeadRot(), 0.0F);
-                super.tickHeadTurn(getYHeadRot(), 0.0F);
+                super.tickHeadTurn(this.getYHeadRot(), 0.0F);
             }
 
             KeyframeAnimation newMainHandPose = null;
@@ -189,27 +126,27 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
             }
 
             KeyframeAnimation newOffHandPose = null;
-            if (MobAttackHelper.isDualWielding(mob)) {
-                WeaponAttributes offHandAttributes = WeaponRegistry.getAttributes(mob.getOffhandItem());
+            if (MobAttackHelper.isDualWielding((Mob) (Object) this)) {
+                WeaponAttributes offHandAttributes = WeaponRegistry.getAttributes(this.getOffhandItem());
                 if (offHandAttributes != null && offHandAttributes.offHandPose() != null) {
                     newOffHandPose = AnimationRegistry.animations.get(offHandAttributes.offHandPose());
                 }
             }
 
-            this.mainHandItemPose.setPose(newMainHandPose, isLeftHanded);
-            this.offHandItemPose.setPose(newOffHandPose, isLeftHanded);
-            if (!MobAttackHelper.isTwoHandedWielding(mob) && (this.isWalking() || this.isShiftKeyDown())) {
+            this.bettermobcombat$mainHandItemPose.setPose(newMainHandPose, isLeftHanded);
+            this.bettermobcombat$offHandItemPose.setPose(newOffHandPose, isLeftHanded);
+            if (!MobAttackHelper.isTwoHandedWielding((Mob) (Object) this) && (this.bettermobcombat$isWalking() || this.isShiftKeyDown())) {
                 newMainHandPose = null;
                 newOffHandPose = null;
             }
 
-            this.mainHandBodyPose.setPose(newMainHandPose, isLeftHanded);
-            this.offHandBodyPose.setPose(newOffHandPose, isLeftHanded);
+            this.bettermobcombat$mainHandBodyPose.setPose(newMainHandPose, isLeftHanded);
+            this.bettermobcombat$offHandBodyPose.setPose(newOffHandPose, isLeftHanded);
         } else {
-            this.mainHandBodyPose.setPose(null, isLeftHanded);
-            this.mainHandItemPose.setPose(null, isLeftHanded);
-            this.offHandBodyPose.setPose(null, isLeftHanded);
-            this.offHandItemPose.setPose(null, isLeftHanded);
+            this.bettermobcombat$mainHandBodyPose.setPose(null, isLeftHanded);
+            this.bettermobcombat$mainHandItemPose.setPose(null, isLeftHanded);
+            this.bettermobcombat$offHandBodyPose.setPose(null, isLeftHanded);
+            this.bettermobcombat$offHandItemPose.setPose(null, isLeftHanded);
         }
     }
 
@@ -218,7 +155,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
         try {
             KeyframeAnimation animation = AnimationRegistry.animations.get(name);
             KeyframeAnimation.AnimationBuilder copy = animation.mutableCopy();
-            this.updateAnimationByCurrentActivity(copy);
+            this.bettermobcombat$updateAnimationByCurrentActivity(copy);
             copy.torso.fullyEnablePart(true);
             copy.head.pitch.setEnabled(false);
             float speed = (float) animation.endTick / length;
@@ -230,20 +167,20 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
             int fadeIn = copy.beginTick;
             float upswingSpeed = speed / BetterCombat.config.getUpswingMultiplier();
             float downwindSpeed = (float) ((double) speed * Mth.lerp(Math.max((double) BetterCombat.config.getUpswingMultiplier() - 0.5, 0.0) / 0.5, 1.0F - upswing, upswing / (1.0F - upswing)));
-            this.attackAnimation.speed.set(upswingSpeed, List.of(new TransmissionSpeedModifier.Gear(length * upswing, downwindSpeed), new TransmissionSpeedModifier.Gear(length, speed)));
-            this.attackAnimation.mirror.setEnabled(mirror);
+            this.bettermobcombat$attackAnimation.speed.set(upswingSpeed, List.of(new TransmissionSpeedModifier.Gear(length * upswing, downwindSpeed), new TransmissionSpeedModifier.Gear(length, speed)));
+            this.bettermobcombat$attackAnimation.mirror.setEnabled(mirror);
             CustomAnimationPlayer player = new CustomAnimationPlayer(copy.build(), 0);
             player.setFirstPersonMode(CompatibilityFlags.firstPersonRender() ? FirstPersonMode.THIRD_PERSON_MODEL : FirstPersonMode.NONE);
-            player.setFirstPersonConfiguration(this.firstPersonConfig(animatedHand));
-            this.attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeIn, Ease.INOUTSINE), player);
-        } catch (Exception var13) {
-            var13.printStackTrace();
+            player.setFirstPersonConfiguration(this.bettermobcombat$firstPersonConfig(animatedHand));
+            this.bettermobcombat$attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeIn, Ease.INOUTSINE), player);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
 
     @Unique
-    private AdjustmentModifier createAttackAdjustment() {
+    private AdjustmentModifier bettermobcombat$createAttackAdjustment() {
         return new AdjustmentModifier((partName) -> {
             float rotationX = 0.0F;
             float rotationY = 0.0F;
@@ -292,7 +229,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
     }
 
     @Unique
-    private AdjustmentModifier createPoseAdjustment() {
+    private AdjustmentModifier bettermobcombat$createPoseAdjustment() {
         return new HarshAdjustmentModifier((partName) -> {
             float rotationX = 0.0F;
             float rotationY = 0.0F;
@@ -304,7 +241,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
                 switch (partName) {
                     case "rightArm":
                     case "leftArm":
-                        if (!this.mainHandItemPose.lastAnimationUsesBodyChannel && this.isShiftKeyDown()) {
+                        if (!this.bettermobcombat$mainHandItemPose.lastAnimationUsesBodyChannel && this.isShiftKeyDown()) {
                             offsetY += 3.0F;
                         }
                         break;
@@ -318,7 +255,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
     }
 
     @Unique
-    private void updateAnimationByCurrentActivity(KeyframeAnimation.AnimationBuilder animation) {
+    private void bettermobcombat$updateAnimationByCurrentActivity(KeyframeAnimation.AnimationBuilder animation) {
         Pose pose = this.getPose();
         switch (pose) {
             case SWIMMING:
@@ -332,7 +269,7 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
             case LONG_JUMPING:
             case DYING:
             default:
-                if (this.isMounting()) {
+                if (this.bettermobcombat$isMounting()) {
                     StateCollectionHelper.configure(animation.rightLeg, false, false);
                     StateCollectionHelper.configure(animation.leftLeg, false, false);
                 }
@@ -341,28 +278,28 @@ public abstract class MobMixinClient extends LivingEntity implements PlayerAttac
     }
 
     @Unique
-    private boolean isWalking() {
+    private boolean bettermobcombat$isWalking() {
         return !this.isDeadOrDying() && (this.isSwimming() || this.getDeltaMovement().horizontalDistance() > 0.03);
     }
 
     @Unique
-    private boolean isMounting() {
+    private boolean bettermobcombat$isMounting() {
         return this.getVehicle() != null;
     }
 
     @Override
     public void stopAttackAnimation(float length) {
-        IAnimation currentAnimation = this.attackAnimation.base.getAnimation();
+        IAnimation currentAnimation = this.bettermobcombat$attackAnimation.base.getAnimation();
         if (currentAnimation != null && currentAnimation instanceof KeyframeAnimationPlayer) {
             int fadeOut = Math.round(length);
-            this.attackAnimation.adjustmentModifier.fadeOut(fadeOut);
-            this.attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeOut, Ease.INOUTSINE), null);
+            this.bettermobcombat$attackAnimation.adjustmentModifier.fadeOut(fadeOut);
+            this.bettermobcombat$attackAnimation.base.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(fadeOut, Ease.INOUTSINE), null);
         }
 
     }
 
     @Unique
-    private FirstPersonConfiguration firstPersonConfig(AnimatedHand animatedHand) {
+    private FirstPersonConfiguration bettermobcombat$firstPersonConfig(AnimatedHand animatedHand) {
         boolean showRightItem = true;
         boolean showLeftItem = BetterCombatClient.config.isShowingOtherHandFirstPerson || animatedHand == AnimatedHand.TWO_HANDED;
         boolean showRightArm = showRightItem && BetterCombatClient.config.isShowingArmsInFirstPerson;

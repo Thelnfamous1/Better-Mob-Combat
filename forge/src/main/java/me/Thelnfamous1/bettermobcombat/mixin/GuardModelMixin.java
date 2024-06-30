@@ -1,7 +1,7 @@
 package me.Thelnfamous1.bettermobcombat.mixin;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import me.Thelnfamous1.bettermobcombat.api.client.MobPlayerModel;
+import me.Thelnfamous1.bettermobcombat.client.MobModelHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,6 +16,6 @@ public abstract class GuardModelMixin {
             at = @At(value = "INVOKE", target = "Ltallestegg/guardvillagers/client/models/GuardModel;holdWeaponHigh(Ltallestegg/guardvillagers/entities/Guard;)V", remap = false)
     )
     private boolean onlyAnimateWeaponHighIfAllowed(GuardModel model, Guard guard) {
-        return !MobPlayerModel.bettermobcombat$isAnimating(guard);
+        return !MobModelHelper.isAnimating(guard);
     }
 }

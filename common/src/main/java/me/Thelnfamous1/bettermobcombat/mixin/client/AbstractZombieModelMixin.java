@@ -1,7 +1,7 @@
 package me.Thelnfamous1.bettermobcombat.mixin.client;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import me.Thelnfamous1.bettermobcombat.api.client.MobPlayerModel;
+import me.Thelnfamous1.bettermobcombat.client.MobModelHelper;
 import net.minecraft.client.model.AbstractZombieModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -26,6 +26,6 @@ public abstract class AbstractZombieModelMixin<T extends Monster> extends Humano
                                                    float $$3,
                                                    float $$4,
                                                    float $$5) {
-        return !MobPlayerModel.bettermobcombat$isAnimating(zombie);
+        return !MobModelHelper.isAnimating(zombie);
     }
 }
