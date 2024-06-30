@@ -3,12 +3,12 @@ package me.Thelnfamous1.bettermobcombat.logic;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import me.Thelnfamous1.bettermobcombat.Constants;
+import me.Thelnfamous1.bettermobcombat.api.MobAttackRangeExtensions;
 import me.Thelnfamous1.bettermobcombat.mixin.MobAccessor;
 import me.Thelnfamous1.bettermobcombat.mixin.ServerNetworkAccessor;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.WeaponAttributes;
-import net.bettercombat.api.client.AttackRangeExtensions;
 import net.bettercombat.client.collision.OrientedBoundingBox;
 import net.bettercombat.client.collision.WeaponHitBoxes;
 import net.bettercombat.logic.PlayerAttackProperties;
@@ -199,7 +199,7 @@ public class MobCombatHelper {
 
     public static boolean isWithinAttackRange(LivingEntity mob, Entity target, WeaponAttributes.Attack attack, double attackRange) {
         Vec3 origin = MobTargetFinder.getInitialTracingPoint(mob);
-        if (!AttackRangeExtensions.sources().isEmpty()) {
+        if (!MobAttackRangeExtensions.sources().isEmpty()) {
             attackRange = MobTargetFinder.applyAttackRangeModifiers(mob, attackRange);
         }
 
