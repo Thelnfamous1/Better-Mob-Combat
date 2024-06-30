@@ -17,7 +17,6 @@ import net.bettercombat.logic.WeaponRegistry;
 import net.bettercombat.logic.knockback.ConfigurableKnockback;
 import net.bettercombat.mixin.LivingEntityAccessor;
 import net.bettercombat.utils.MathHelper;
-import net.bettercombat.utils.SoundHelper;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -90,7 +89,7 @@ public class MobCombatHelper {
                             MobAttackHelper.setAttributesForOffHandAttack(mob, true);
                         }
 
-                        SoundHelper.playSound((ServerLevel) world, mob, attack.swingSound());
+                        MobSoundHelper.playSound((ServerLevel)world, mob, attack.swingSound());
                         if (BetterCombat.config.allow_reworked_sweeping && targets.size() > 1) {
                             double multiplier = 1.0 - (double)(BetterCombat.config.reworked_sweeping_maximum_damage_penalty / (float)BetterCombat.config.reworked_sweeping_extra_target_count * (float)Math.min(BetterCombat.config.reworked_sweeping_extra_target_count, targets.size() - 1));
                             sweepingLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SWEEPING_EDGE, hand.itemStack());

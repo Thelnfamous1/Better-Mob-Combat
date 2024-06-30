@@ -22,5 +22,6 @@ public class BetterMobCombatForgeNetwork {
     public static void register() {
         SYNC_CHANNEL.registerMessage(INDEX++, S2CAttackAnimation.class, S2CAttackAnimation::write, S2CAttackAnimation::read, S2CAttackAnimation::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
         SYNC_CHANNEL.registerMessage(INDEX++, S2CConfigSync.class, S2CConfigSync::write, S2CConfigSync::read, S2CConfigSync::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        SYNC_CHANNEL.registerMessage(INDEX++, S2CAttackSound.class, S2CAttackSound::write, S2CAttackSound::read, S2CAttackSound::handle, Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 }

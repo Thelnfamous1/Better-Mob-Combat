@@ -1,8 +1,11 @@
 package me.Thelnfamous1.bettermobcombat.platform.services;
 
 import net.bettercombat.logic.AnimatedHand;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
 
 public interface IPlatformHelper {
 
@@ -45,4 +48,6 @@ public interface IPlatformHelper {
     void stopMobAttackAnimation(LivingEntity mob, int downWind);
 
     void updateServerConfig(ServerPlayer player);
+
+    void playMobAttackSound(ServerLevel world, int mobId, double x, double y, double z, String soundId, float volume, float pitch, long seed, float distance, ResourceKey<Level> dimension);
 }
