@@ -9,26 +9,14 @@
     "LivingEntityMixin",
     "MeleeAttackGoalMixin",
     "MeleeAttackMixin",
+    "MobMixin_AttackAnimation",
     "MobAccessor",
-    "MobMixin",
+    "MobMixin_AttackLogic",
     "RangedWeaponItemMixin",
     "ServerNetworkAccessor"
   ],
   "client": [
-    "client.AbstractZombieModelMixin",
-    "client.EntityRenderDispatcherMixin",
-    "client.EntityModelMixin",
-    "client.HierarchicalModelMixin",
-    "client.HumanoidMobRendererMixin",
-    "client.HumanoidModelMixin",
-    "client.IllagerModelMixin",
-    "client.LivingEntityRendererMixin",
-    "client.MobMixinClient_bettercombat",
-    "client.MobMixinClient_playeranimator",
-    "client.MobRendererMixin",
-    "client.PiglinModelMixin",
-    "client.SkeletonModelMixin",
-    "client.ZombieVillagerModelMixin"
+    "client.EntityRenderDispatcherMixin"
   ],
   "server": [
   ],

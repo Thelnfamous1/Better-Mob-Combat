@@ -8,7 +8,6 @@
     "GuardMeleeGoalMixin"
   ],
   "client": [
-    "GuardModelMixin"
   ],
   "server": [
   ],

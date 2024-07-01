@@ -21,6 +21,7 @@ import net.bettercombat.client.animation.PlayerAttackAnimatable;
 import net.bettercombat.logic.AnimatedHand;
 import net.bettercombat.logic.PlayerAttackProperties;
 import net.bettercombat.logic.WeaponRegistry;
+import net.bettercombat.utils.MathHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.*;
@@ -44,7 +45,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Mixin(value = Mob.class)
-public abstract class MobMixin extends LivingEntity implements EntityPlayer_BetterCombat, MobAttackStrength, MobAttackWindup, PlayerAttackProperties {
+public abstract class MobMixin_AttackLogic extends LivingEntity implements EntityPlayer_BetterCombat, MobAttackStrength, MobAttackWindup, PlayerAttackProperties {
 
     @Unique
     private int bettermobcombat$comboCount = 0;
@@ -63,9 +64,6 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     @Nullable
     public abstract LivingEntity getTarget();
 
-    @Shadow
-    public abstract boolean doHurtTarget(Entity $$0);
-
     @Unique
     private ItemStack bettermobcombat$upswingStack;
     @Unique
@@ -81,7 +79,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
     @Unique
     private List<Entity> bettermobcombat$targetsInReach = null;
 
-    protected MobMixin(EntityType<? extends LivingEntity> $$0, Level $$1) {
+    protected MobMixin_AttackLogic(EntityType<? extends LivingEntity> $$0, Level $$1) {
         super($$0, $$1);
     }
 
@@ -388,11 +386,11 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
             WeaponAttributes.Attack attack = hand.attack();
             double upswingRate = hand.upswingRate();
             if (!(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - upswingRate)) {
-                Entity cursorTarget = this.getTarget();
+                Entity intendedTarget = this.getTarget();
                 List<Entity> targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), null, attack, hand.attributes().attackRange());
                 this.bettermobcombat$updateTargetsInReach(targets);
-                if (targets.size() == 0) {
-                    Constants.LOG.warn("Mob {} executed an attack with no targets in range", this);
+                if (intendedTarget == null && targets.size() == 0) {
+                    Constants.LOG.debug("Mob {} executed an attack with no AI attack target and no targets in range", this);
                     // PlatformClient.onEmptyLeftClick(((Mob)(Object)this));
                 }
 
@@ -400,7 +398,7 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
 
                 this.bettercombat$resetAttackStrengthTicker();
                 BetterMobCombatEvents.ATTACK_HIT.invoke((handler) -> {
-                    handler.onMobAttackHit(((Mob)(Object)this), hand, targets, cursorTarget);
+                    handler.onMobAttackHit(((Mob)(Object)this), hand, targets, intendedTarget);
                 });
                 this.setComboCount(this.getComboCount() + 1);
                 if (!hand.isOffHand()) {
@@ -487,5 +485,37 @@ public abstract class MobMixin extends LivingEntity implements EntityPlayer_Bett
                 cir.setReturnValue(MobCombatHelper.isWithinAttackRange(m, target, currentAttack.attack(), wa.attackRange()));
             }
         });
+    }
+
+    @Inject(
+            method = {"aiStep"},
+            at = {@At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V"
+            )}
+    )
+    private void tickMovement_ModifyInput(CallbackInfo ci) {
+        double multiplier = Math.min(Math.max(BetterCombat.config.movement_speed_while_attacking, 0.0), 1.0);
+        if (multiplier != 1.0) {
+            if (!this.isPassenger() || BetterCombat.config.movement_speed_effected_while_mounting) {
+                float swingProgress = ((MobAttackWindup) this).bettermobcombat$getSwingProgress();
+                if ((double)swingProgress < 0.98) {
+                    if (BetterCombat.config.movement_speed_applied_smoothly) {
+                        double p2;
+                        if ((double)swingProgress <= 0.5) {
+                            p2 = MathHelper.easeOutCubic(swingProgress * 2.0F);
+                        } else {
+                            p2 = MathHelper.easeOutCubic(1.0 - ((double)swingProgress - 0.5) * 2.0);
+                        }
+
+                        multiplier = (float)(1.0 - (1.0 - multiplier) * p2);
+                    }
+
+                    this.zza *= multiplier;
+                    this.xxa *= multiplier;
+                }
+
+            }
+        }
     }
 }

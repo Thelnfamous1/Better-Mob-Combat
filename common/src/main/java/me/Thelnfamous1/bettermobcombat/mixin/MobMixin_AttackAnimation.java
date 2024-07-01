@@ -1,4 +1,4 @@
-package me.Thelnfamous1.bettermobcombat.mixin.client;
+package me.Thelnfamous1.bettermobcombat.mixin;
 
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonConfiguration;
 import dev.kosmx.playerAnim.api.firstPerson.FirstPersonMode;
@@ -12,7 +12,6 @@ import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
-import me.Thelnfamous1.bettermobcombat.api.MobAttackWindup;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.WeaponAttributes;
@@ -23,7 +22,6 @@ import net.bettercombat.client.animation.modifier.TransmissionSpeedModifier;
 import net.bettercombat.compatibility.CompatibilityFlags;
 import net.bettercombat.logic.AnimatedHand;
 import net.bettercombat.logic.WeaponRegistry;
-import net.bettercombat.utils.MathHelper;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -43,7 +41,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Mixin(value = Mob.class)
-public abstract class MobMixinClient_bettercombat extends LivingEntity implements PlayerAttackAnimatable, IAnimatedPlayer {
+public abstract class MobMixin_AttackAnimation extends LivingEntity implements PlayerAttackAnimatable, IAnimatedPlayer {
     @Shadow public abstract boolean isLeftHanded();
 
     @Unique
@@ -56,40 +54,8 @@ public abstract class MobMixinClient_bettercombat extends LivingEntity implement
     private final PoseSubStack bettermobcombat$offHandBodyPose = new PoseSubStack(null, true, false);
     @Unique
     private final PoseSubStack bettermobcombat$offHandItemPose = new PoseSubStack(null, false, true);
-    protected MobMixinClient_bettercombat(EntityType<? extends Mob> $$0, Level $$1) {
+    protected MobMixin_AttackAnimation(EntityType<? extends Mob> $$0, Level $$1) {
         super($$0, $$1);
-    }
-
-    @Inject(
-            method = {"aiStep"},
-            at = {@At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V"
-            )}
-    )
-    private void tickMovement_ModifyInput(CallbackInfo ci) {
-        double multiplier = Math.min(Math.max(BetterCombat.config.movement_speed_while_attacking, 0.0), 1.0);
-        if (multiplier != 1.0) {
-            if (!this.isPassenger() || BetterCombat.config.movement_speed_effected_while_mounting) {
-                float swingProgress = ((MobAttackWindup) this).bettermobcombat$getSwingProgress();
-                if ((double)swingProgress < 0.98) {
-                    if (BetterCombat.config.movement_speed_applied_smoothly) {
-                        double p2;
-                        if ((double)swingProgress <= 0.5) {
-                            p2 = MathHelper.easeOutCubic(swingProgress * 2.0F);
-                        } else {
-                            p2 = MathHelper.easeOutCubic(1.0 - ((double)swingProgress - 0.5) * 2.0);
-                        }
-
-                        multiplier = (float)(1.0 - (1.0 - multiplier) * p2);
-                    }
-
-                    this.zza *= multiplier;
-                    this.xxa *= multiplier;
-                }
-
-            }
-        }
     }
 
     @Inject(

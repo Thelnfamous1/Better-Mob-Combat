@@ -31,6 +31,12 @@ versionRange = "${better_combat_version_range}"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.${mod_id}]]
+modId="mobplayeranimator"
+mandatory=true
+versionRange="${mob_player_anim_version_range}"
+ordering="AFTER"
+side="BOTH"
+[[dependencies.${mod_id}]]
 modId="playeranimator"
 mandatory=true
 versionRange="${player_anim_version_range}"

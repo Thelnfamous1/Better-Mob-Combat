@@ -17,7 +17,7 @@ public class BetterMobCombatEvents {
 
     @FunctionalInterface
     public interface MobAttackHit {
-        void onMobAttackHit(Mob mob, AttackHand attackHand, List<Entity> targets, @Nullable Entity target);
+        void onMobAttackHit(Mob mob, AttackHand attackHand, List<Entity> targets, @Nullable Entity intendedTarget);
     }
 
     @FunctionalInterface
