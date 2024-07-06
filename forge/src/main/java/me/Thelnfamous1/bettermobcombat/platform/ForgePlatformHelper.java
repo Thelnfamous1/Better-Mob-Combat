@@ -1,6 +1,6 @@
 package me.Thelnfamous1.bettermobcombat.platform;
 
-import me.Thelnfamous1.bettermobcombat.BetterMobCombatCommon;
+import me.Thelnfamous1.bettermobcombat.BetterMobCombat;
 import me.Thelnfamous1.bettermobcombat.network.*;
 import me.Thelnfamous1.bettermobcombat.platform.services.IPlatformHelper;
 import net.bettercombat.logic.AnimatedHand;
@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class ForgePlatformHelper implements IPlatformHelper {
 
@@ -40,32 +41,40 @@ public class ForgePlatformHelper implements IPlatformHelper {
 
     @Override
     public void playMobAttackAnimation(LivingEntity mob, AnimatedHand animatedHand, String animationName, float length, float upswing) {
-        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob),
+        BMCForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob),
                 new S2CAttackAnimation(mob.getId(), animatedHand, animationName, length, upswing));
     }
 
     @Override
     public void stopMobAttackAnimation(LivingEntity mob, int downWind) {
-        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob),
+        BMCForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob),
                 S2CAttackAnimation.stop(mob.getId(), downWind));
     }
 
     @Override
-    public void updateServerConfig(ServerPlayer player) {
-        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                new S2CConfigSync(BetterMobCombatCommon.getServerConfigSerialized()));
+    public void syncServerConfig(ServerPlayer player) {
+        BMCForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
+                new S2CConfigSync(BetterMobCombat.getServerConfigSerialized()));
     }
 
     @Override
     public void playMobAttackSound(ServerLevel world, int mobId, double x, double y, double z, String soundId, float volume, float pitch, long seed, float distance, ResourceKey<Level> dimension) {
-        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.NEAR.with(() -> PacketDistributor.TargetPoint.p(x, y, z, distance, dimension).get()),
+        BMCForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.NEAR.with(() -> PacketDistributor.TargetPoint.p(x, y, z, distance, dimension).get()),
                 new S2CAttackSound(mobId, x, y, z, soundId, volume, pitch, seed));
     }
 
     @Override
     public void syncMobComboCount(LivingEntity mob, int comboCount) {
-        BetterMobCombatForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob),
+        BMCForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.TRACKING_ENTITY.with(() -> mob),
                 new S2CComboCountSync(mob.getId(), comboCount));
+    }
+
+    @Override
+    public void syncServerConfig() {
+        if(ServerLifecycleHooks.getCurrentServer() != null){
+            BMCForgeNetwork.SYNC_CHANNEL.send(PacketDistributor.ALL.noArg(),
+                    new S2CConfigSync(BetterMobCombat.getServerConfigSerialized()));
+        }
     }
 
 }

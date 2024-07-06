@@ -1,6 +1,6 @@
 package me.Thelnfamous1.bettermobcombat.network;
 
-import me.Thelnfamous1.bettermobcombat.BetterMobCombatCommon;
+import me.Thelnfamous1.bettermobcombat.BetterMobCombat;
 import me.Thelnfamous1.bettermobcombat.config.BMCServerConfig;
 import net.bettercombat.client.BetterCombatClient;
 import net.bettercombat.client.animation.PlayerAttackAnimatable;
@@ -15,7 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 
-public class BetterMobCombatNetworkClient {
+public class BMCClientNetworkHandler {
     static void handleAttackAnimation(int mobId, String animationName, float length, AnimatedHand animatedHand, float upswing) {
         Entity entity = Minecraft.getInstance().level.getEntity(mobId);
         if (entity instanceof LivingEntity) {
@@ -29,7 +29,7 @@ public class BetterMobCombatNetworkClient {
 
     public static void handleConfigSync(String json) {
         BMCServerConfig config = BMCServerConfig.deserialize(json);
-        BetterMobCombatCommon.updateServerConfig(config, true);
+        BetterMobCombat.updateServerConfig(config, true);
     }
 
     public static void handlePlaySound(int mobId, double x, double y, double z, String soundId, float volume, float pitch, long seed) {

@@ -23,7 +23,7 @@ public record S2CComboCountSync(int mobId, int comboCount) {
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().enqueueWork(() -> {
-            BetterMobCombatNetworkClient.handleComboSync(this.mobId(), this.comboCount());
+            BMCClientNetworkHandler.handleComboSync(this.mobId(), this.comboCount());
         });
         ctx.get().setPacketHandled(true);
     }

@@ -44,7 +44,7 @@ public class FabricPlatformHelper implements IPlatformHelper {
     }
 
     @Override
-    public void updateServerConfig(ServerPlayer player) {
+    public void syncServerConfig(ServerPlayer player) {
 
     }
 
@@ -55,6 +55,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
 
     @Override
     public void syncMobComboCount(LivingEntity mob, int comboCount) {
+
+    }
+
+    @Override
+    public void syncServerConfig() {
 
     }
 

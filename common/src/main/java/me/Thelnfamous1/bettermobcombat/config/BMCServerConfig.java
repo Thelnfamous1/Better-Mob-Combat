@@ -16,6 +16,13 @@ public class BMCServerConfig implements ConfigData {
             max = 100L
     )
     public int mob_additional_attack_cooldown = 7;
+    @Comment("Controls which mobs are blacklisted from using the Better Combat system. \nHelpful if certain mobs aren't able to properly animate Better Combat attacks.")
+    public String[] mob_blacklist = new String[]{"minecraft:fox"};
+
+    @Comment("Allows the mob blacklist to instead be used as a whitelist. \nThis makes it so that only mobs in the whitelist can use the Better Combat system.")
+    public boolean mob_blacklist_as_whitelist = false;
+    @Comment("Automatically blacklists mobs detected to be using a GeckoLib model from using the Better Combat system. \nGeckoLib models are not supported by Mob Player Animator, and therefore won't animate Better Combat attacks.")
+    public boolean geckolib_mobs_blacklisted = true;
 
     public BMCServerConfig() {
     }
@@ -27,4 +34,5 @@ public class BMCServerConfig implements ConfigData {
     public String serialize() {
         return GSON.toJson(this);
     }
+
 }

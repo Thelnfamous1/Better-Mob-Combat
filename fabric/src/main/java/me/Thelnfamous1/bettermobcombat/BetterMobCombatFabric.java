@@ -12,6 +12,6 @@ public class BetterMobCombatFabric implements ModInitializer {
         // project.
 
         // Use Fabric to bootstrap the Common mod.
-        BetterMobCombatCommon.init();
+        BetterMobCombat.init();
     }
 }

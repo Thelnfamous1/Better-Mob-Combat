@@ -4,14 +4,14 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import me.Thelnfamous1.bettermobcombat.BetterMobCombatCommon;
+import me.Thelnfamous1.bettermobcombat.BetterMobCombat;
 import me.Thelnfamous1.bettermobcombat.Constants;
-import me.Thelnfamous1.bettermobcombat.client.BetterMobCombatEvents;
-import me.Thelnfamous1.bettermobcombat.logic.MobTargetFinder;
 import me.Thelnfamous1.bettermobcombat.api.MobAttackStrength;
 import me.Thelnfamous1.bettermobcombat.api.MobAttackWindup;
+import me.Thelnfamous1.bettermobcombat.client.BetterMobCombatEvents;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
 import me.Thelnfamous1.bettermobcombat.logic.MobCombatHelper;
+import me.Thelnfamous1.bettermobcombat.logic.MobTargetFinder;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.AttackHand;
@@ -23,7 +23,6 @@ import net.bettercombat.logic.PlayerAttackProperties;
 import net.bettercombat.logic.WeaponRegistry;
 import net.bettercombat.utils.MathHelper;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -119,12 +118,6 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
         this.attackStrengthTicker = 0;
     }
 
-    @Override
-    public void swing(InteractionHand $$0) {
-        super.swing($$0);
-        this.bettercombat$resetAttackStrengthTicker();
-    }
-
     @Inject(
             method = {"tick"},
             at = {@At("TAIL")}
@@ -171,6 +164,9 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             cancellable = true
     )
     public void getEquippedStack_Pre(EquipmentSlot slot, CallbackInfoReturnable<ItemStack> cir) {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
+            return;
+        }
         boolean mainHandHasTwoHanded = false;
         ItemStack mainHandStack = MobCombatHelper.getDirectMainhand((Mob) (Object) this);
         WeaponAttributes mainHandAttributes = WeaponRegistry.getAttributes(mainHandStack);
@@ -236,6 +232,9 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             )
     )
     public ItemStack getMainHandStack_Redirect(Mob instance, Operation<ItemStack> original) {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
+            return original.call(instance);
+        }
         if (this.bettermobcombat$comboCount < 0) {
             return original.call(instance);
         } else {
@@ -291,7 +290,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
                 this.bettermobcombat$comboReset = Math.round(attackCooldownTicksFloat * BetterCombat.config.combo_reset_rate);
                 this.bettermobcombat$upswingTicks = Math.max(Math.round(attackCooldownTicksFloat * upswingRate), 1);
                 this.bettermobcombat$lastSwingDuration = attackCooldownTicksFloat;
-                this.bettermobcombat$setAttackCooldown(attackCooldownTicks + BetterMobCombatCommon.getServerConfig().mob_additional_attack_cooldown);
+                this.bettermobcombat$setAttackCooldown(attackCooldownTicks + BetterMobCombat.getServerConfig().mob_additional_attack_cooldown);
                 String animationName = hand.attack().animation();
                 boolean isOffHand = hand.isOffHand();
                 AnimatedHand animatedHand = AnimatedHand.from(isOffHand, attributes.isTwoHanded());
@@ -338,6 +337,9 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
 
     @Unique
     private boolean bettermobcombat$shouldUpdateTargetsInReach() {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
+            return false;
+        }
         return !this.level().isClientSide && this.getTarget() != null && this.bettermobcombat$targetsInReach == null;
     }
 
@@ -381,6 +383,9 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
 
     @Unique
     private void bettermobcombat$performAttack() {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
+            return;
+        }
         AttackHand hand = this.bettermobcombat$getCurrentHand();
         if (hand != null) {
             WeaponAttributes.Attack attack = hand.attack();
@@ -410,6 +415,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     }
 
     @Unique
+    @Nullable
     private AttackHand bettermobcombat$getCurrentHand() {
         return MobAttackHelper.getCurrentAttack(((Mob) (Object) this), this.getComboCount());
     }
@@ -435,6 +441,9 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
 
     @Unique
     private void bettermobcombat$cancelWeaponSwing() {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
+            return;
+        }
         int downWind = (int) Math.round((double) MobAttackHelper.getAttackCooldownTicksCapped(((Mob) (Object) this)) * (1.0 - 0.5 * (double) BetterCombat.config.upswing_multiplier));
         Services.PLATFORM.stopMobAttackAnimation(this, downWind);
         this.bettermobcombat$upswingStack = null;
@@ -479,7 +488,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
 
     @Inject(method = "isWithinMeleeAttackRange", at = @At("HEAD"), cancellable = true)
     private void pre_isWithinMeleeAttackRange(LivingEntity target, CallbackInfoReturnable<Boolean> cir){
-        MobCombatHelper.onHoldingAnimatedAttackWeapon((Mob) (Object)this, (m, wa) -> {
+        MobCombatHelper.onHoldingBetterCombatWeapon((Mob) (Object)this, (m, wa) -> {
             AttackHand currentAttack = this.getCurrentAttack();
             if(currentAttack != null){
                 cir.setReturnValue(MobCombatHelper.isWithinAttackRange(m, target, currentAttack.attack(), wa.attackRange()));
@@ -495,10 +504,13 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             )}
     )
     private void tickMovement_ModifyInput(CallbackInfo ci) {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
+            return;
+        }
         double multiplier = Math.min(Math.max(BetterCombat.config.movement_speed_while_attacking, 0.0), 1.0);
         if (multiplier != 1.0) {
             if (!this.isPassenger() || BetterCombat.config.movement_speed_effected_while_mounting) {
-                float swingProgress = ((MobAttackWindup) this).bettermobcombat$getSwingProgress();
+                float swingProgress = this.bettermobcombat$getSwingProgress();
                 if ((double)swingProgress < 0.98) {
                     if (BetterCombat.config.movement_speed_applied_smoothly) {
                         double p2;

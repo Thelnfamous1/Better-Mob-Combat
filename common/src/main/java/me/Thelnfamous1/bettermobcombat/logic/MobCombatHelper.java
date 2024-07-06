@@ -2,6 +2,7 @@ package me.Thelnfamous1.bettermobcombat.logic;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import me.Thelnfamous1.bettermobcombat.BetterMobCombat;
 import me.Thelnfamous1.bettermobcombat.Constants;
 import me.Thelnfamous1.bettermobcombat.api.MobAttackRangeExtensions;
 import me.Thelnfamous1.bettermobcombat.mixin.MobAccessor;
@@ -38,6 +39,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
 
 public class MobCombatHelper {
 
@@ -49,11 +51,25 @@ public class MobCombatHelper {
         return ((MobAccessor)mob).bettermobcombat$getHandItems().get(EquipmentSlot.OFFHAND.getIndex());
     }
 
-    public static void onHoldingAnimatedAttackWeapon(Mob mob, BiConsumer<Mob, WeaponAttributes> callback) {
+    public static void onHoldingBetterCombatWeapon(Mob mob, BiConsumer<Mob, WeaponAttributes> callback) {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(mob)){
+            return;
+        }
         WeaponAttributes attributes = WeaponRegistry.getAttributes(mob.getMainHandItem());
         if (attributes != null && attributes.attacks() != null) {
             callback.accept(mob, attributes);
         }
+    }
+
+    public static boolean canUseBetterCombatWeapon(Mob mob, BiPredicate<Mob, WeaponAttributes> predicate) {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(mob)){
+            return false;
+        }
+        WeaponAttributes attributes = WeaponRegistry.getAttributes(mob.getMainHandItem());
+        if (attributes != null && attributes.attacks() != null) {
+            return predicate.test(mob, attributes);
+        }
+        return false;
     }
 
     public static void processAttack(Level world, Mob mob, int comboCount, List<Entity> targets){

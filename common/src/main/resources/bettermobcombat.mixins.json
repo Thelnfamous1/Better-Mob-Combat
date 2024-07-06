@@ -9,8 +9,8 @@
     "LivingEntityMixin",
     "MeleeAttackGoalMixin",
     "MeleeAttackMixin",
-    "MobMixin_AttackAnimation",
     "MobAccessor",
+    "MobMixin_AttackAnimation",
     "MobMixin_AttackLogic",
     "RangedWeaponItemMixin",
     "ServerNetworkAccessor"

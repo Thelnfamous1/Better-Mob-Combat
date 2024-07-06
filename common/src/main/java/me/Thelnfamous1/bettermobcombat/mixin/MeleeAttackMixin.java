@@ -28,7 +28,7 @@ public abstract class MeleeAttackMixin {
 
     @Inject(method = "lambda$create$0", at = @At(value = "HEAD"), cancellable = true)
     private static void pre_executeMeleeAttack(BehaviorBuilder.Instance instance, MemoryAccessor attackTarget, MemoryAccessor nvle, MemoryAccessor lookTarget, MemoryAccessor attackCoolingDown, int $$5x, ServerLevel $$6, Mob mob, long $$8, CallbackInfoReturnable<Boolean> cir){
-        MobCombatHelper.onHoldingAnimatedAttackWeapon(mob, (m, wa) -> {
+        MobCombatHelper.onHoldingBetterCombatWeapon(mob, (m, wa) -> {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat)m).getCurrentAttack();
             if(currentAttack != null){
                 LivingEntity target = (LivingEntity)instance.get(attackTarget);

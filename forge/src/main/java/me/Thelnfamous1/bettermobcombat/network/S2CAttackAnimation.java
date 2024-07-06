@@ -35,7 +35,7 @@ public record S2CAttackAnimation(int mobId, AnimatedHand animatedHand, String an
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().enqueueWork(() -> {
-            BetterMobCombatNetworkClient.handleAttackAnimation(this.mobId(), this.animationName(), this.length(), this.animatedHand(), this.upswing());
+            BMCClientNetworkHandler.handleAttackAnimation(this.mobId(), this.animationName(), this.length(), this.animatedHand(), this.upswing());
         });
         ctx.get().setPacketHandled(true);
     }

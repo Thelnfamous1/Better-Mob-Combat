@@ -1,5 +1,6 @@
 package me.Thelnfamous1.bettermobcombat.logic;
 
+import me.Thelnfamous1.bettermobcombat.BetterMobCombat;
 import me.Thelnfamous1.bettermobcombat.api.MobAttackStrength;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.AttackHand;
@@ -9,6 +10,7 @@ import net.bettercombat.logic.WeaponRegistry;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -27,6 +29,9 @@ public class MobAttackHelper {
     }
 
     public static boolean isDualWielding(LivingEntity mob) {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(mob)){
+            return false;
+        }
         WeaponAttributes mainAttributes = WeaponRegistry.getAttributes(mob.getMainHandItem());
         WeaponAttributes offAttributes = WeaponRegistry.getAttributes(mob.getOffhandItem());
         return mainAttributes != null && !mainAttributes.isTwoHanded() && offAttributes != null && !offAttributes.isTwoHanded();
@@ -41,7 +46,11 @@ public class MobAttackHelper {
         return Math.max(((MobAttackStrength)mob).bettermobcombat$getCurrentItemAttackStrengthDelay(), (float)BetterCombat.config.attack_interval_cap);
     }
 
+    @Nullable
     public static AttackHand getCurrentAttack(LivingEntity mob, int comboCount) {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(mob)){
+            return null;
+        }
         if (isDualWielding(mob)) {
             boolean isOffHand = shouldAttackWithOffHand(mob, comboCount);
             ItemStack itemStack = isOffHand ? mob.getOffhandItem() : mob.getMainHandItem();

@@ -22,6 +22,14 @@ repositories {
     flatDir {
         dirs 'lib'
     }
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupByRegex("software\\.bernie.*")
+            includeGroup("com.eliotlash.mclib")
+        }
+    }
 }
 
 dependencies {
@@ -30,10 +38,13 @@ dependencies {
     implementation("maven.modrinth:better-combat:${project.better_combat_version}-forge")
     // Better Combat Dependencies
     implementation(annotationProcessor("io.github.llamalad7:mixinextras-common:${project.mixin_extras_version}"))
-    implementation("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") {
+    implementation("me.shedaniel.cloth:cloth-config-forge:${project.cloth_config_version}") {
         exclude(group: "net.fabricmc.fabric-api")
     }
     implementation("dev.kosmx.player-anim:player-animation-lib-forge:${project.player_anim_version}")
+
+    compileOnly "software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}"
+    compileOnly("com.eliotlash.mclib:mclib:20")
 }
 
 publishing {

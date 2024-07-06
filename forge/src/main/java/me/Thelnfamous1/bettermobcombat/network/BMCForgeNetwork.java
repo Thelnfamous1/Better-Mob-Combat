@@ -8,7 +8,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.Optional;
 
-public class BetterMobCombatForgeNetwork {
+public class BMCForgeNetwork {
 
     public static final ResourceLocation CHANNEL_NAME = new ResourceLocation(Constants.MOD_ID, "sync_channel");
     private static final String PROTOCOL_VERSION = "1.0";

@@ -21,7 +21,7 @@ public record S2CConfigSync(String json) {
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().enqueueWork(() -> {
-            BetterMobCombatNetworkClient.handleConfigSync(this.json);
+            BMCClientNetworkHandler.handleConfigSync(this.json);
         });
         ctx.get().setPacketHandled(true);
     }

@@ -47,9 +47,11 @@ public interface IPlatformHelper {
 
     void stopMobAttackAnimation(LivingEntity mob, int downWind);
 
-    void updateServerConfig(ServerPlayer player);
+    void syncServerConfig(ServerPlayer player);
 
     void playMobAttackSound(ServerLevel world, int mobId, double x, double y, double z, String soundId, float volume, float pitch, long seed, float distance, ResourceKey<Level> dimension);
 
     void syncMobComboCount(LivingEntity mob, int comboCount);
+
+    void syncServerConfig();
 }

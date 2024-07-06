@@ -1,6 +1,6 @@
 package me.Thelnfamous1.bettermobcombat;
 
-import me.Thelnfamous1.bettermobcombat.network.BetterMobCombatForgeNetwork;
+import me.Thelnfamous1.bettermobcombat.network.BMCForgeNetwork;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
@@ -19,9 +19,9 @@ public class BetterMobCombatForge {
         // project.
     
         // Use Forge to bootstrap the Common mod.
-        BetterMobCombatCommon.init();
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent event) -> BetterMobCombatForgeNetwork.register());
+        BetterMobCombat.init();
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((FMLCommonSetupEvent event) -> BMCForgeNetwork.register());
         MinecraftForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) ->
-                Services.PLATFORM.updateServerConfig((ServerPlayer)event.getEntity()));
+                Services.PLATFORM.syncServerConfig((ServerPlayer)event.getEntity()));
     }
 }

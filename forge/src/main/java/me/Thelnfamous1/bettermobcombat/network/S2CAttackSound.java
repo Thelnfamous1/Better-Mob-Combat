@@ -35,7 +35,7 @@ public record S2CAttackSound(int mobId, double x, double y, double z, String sou
 
     public void handle(Supplier<NetworkEvent.Context> ctx){
         ctx.get().enqueueWork(() -> {
-            BetterMobCombatNetworkClient.handlePlaySound(this.mobId(), this.x(), this.y(), this.z(), this.soundId(), this.volume(), this.pitch(), this.seed());
+            BMCClientNetworkHandler.handlePlaySound(this.mobId(), this.x(), this.y(), this.z(), this.soundId(), this.volume(), this.pitch(), this.seed());
         });
         ctx.get().setPacketHandled(true);
     }

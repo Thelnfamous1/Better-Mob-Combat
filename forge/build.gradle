@@ -85,6 +85,14 @@ repositories {
     flatDir {
         dirs 'lib'
     }
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupByRegex("software\\.bernie.*")
+            includeGroup("com.eliotlash.mclib")
+        }
+    }
 }
 
 dependencies {
@@ -105,6 +113,7 @@ dependencies {
 
     // Mod Compatibility
     implementation fg.deobf("maven.modrinth:guard-villagers:${project.guard_villagers_version}")
+    compileOnly fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {
