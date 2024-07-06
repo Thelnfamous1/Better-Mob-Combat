@@ -68,7 +68,7 @@ public abstract class MeleeAttackGoalMixin extends Goal {
     }
 
     @Inject(method = "canUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/goal/MeleeAttackGoal;getAttackReachSqr(Lnet/minecraft/world/entity/LivingEntity;)D"), cancellable = true)
-    private void pre_getAttackReachSqr(CallbackInfoReturnable<Boolean> cir){
+    private void pre_getAttackReachSqr_canUse(CallbackInfoReturnable<Boolean> cir){
         MobCombatHelper.onHoldingBetterCombatWeapon(this.mob, (m, wa) -> {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat)m).getCurrentAttack();
             if(currentAttack != null){

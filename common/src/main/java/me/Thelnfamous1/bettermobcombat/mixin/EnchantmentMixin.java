@@ -25,7 +25,7 @@ public class EnchantmentMixin {
         at = {@At("RETURN")},
         cancellable = true
     )
-    private void getEquipmentFix(LivingEntity entity, CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> cir) {
+    private void post_getSlotItems(LivingEntity entity, CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> cir) {
         if (entity instanceof Mob mob) {
             int comboCount = ((PlayerAttackProperties)mob).getComboCount();
             AttackHand currentHand = MobAttackHelper.getCurrentAttack(mob, comboCount);

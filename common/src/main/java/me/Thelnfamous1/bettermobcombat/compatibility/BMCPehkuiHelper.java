@@ -12,14 +12,10 @@ public class BMCPehkuiHelper {
     }
 
     public static void load() {
-    }
-
-    static {
         if (Platform.isModLoaded("pehkui")) {
             try {
                 MobAttackRangeExtensions.register((context) -> new AttackRangeExtensions.Modifier(PehkuiHelper.getScale(context.mob()), Operation.MULTIPLY));
             } catch (SecurityException | IllegalArgumentException ignored) {
-
             }
         }
     }

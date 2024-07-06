@@ -21,7 +21,7 @@ public abstract class LivingEntityMixin {
             at = {@At("HEAD")},
             cancellable = true
     )
-    public void getAttributeValue_Inject(Attribute attribute, CallbackInfoReturnable<Double> cir) {
+    public void pre_getAttributeValue(Attribute attribute, CallbackInfoReturnable<Double> cir) {
         if ((Object)this instanceof Mob mob) {
             int comboCount = ((PlayerAttackProperties)mob).getComboCount();
             if (!mob.level().isClientSide && comboCount > 0 && MobAttackHelper.shouldAttackWithOffHand(mob, comboCount)) {
@@ -35,7 +35,7 @@ public abstract class LivingEntityMixin {
     }
 
     @Inject(method = "swing(Lnet/minecraft/world/InteractionHand;)V", at = @At("TAIL"))
-    private void handleSwing(InteractionHand $$0, CallbackInfo ci){
+    private void post_swing(InteractionHand $$0, CallbackInfo ci){
         if(this instanceof MobAttackStrength mob){
             mob.bettercombat$resetAttackStrengthTicker();
         }
