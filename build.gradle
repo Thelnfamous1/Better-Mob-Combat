@@ -77,7 +77,8 @@ subprojects {
                 "better_combat_version_range": better_combat_version_range,
                 "player_anim_version_range": player_anim_version_range,
                 "cloth_config_version_range": cloth_config_version_range,
-                "guard_villagers_version_range": guard_villagers_version_range
+                "guard_villagers_version_range": guard_villagers_version_range,
+                "recruits_version_range": recruits_version_range
         ]
 
         filesMatching(['pack.mcmeta', 'fabric.mod.json', 'META-INF/mods.toml', '*.mixins.json']) {

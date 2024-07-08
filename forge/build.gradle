@@ -114,6 +114,7 @@ dependencies {
     // Mod Compatibility
     implementation fg.deobf("maven.modrinth:guard-villagers:${project.guard_villagers_version}")
     implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
+    implementation fg.deobf("maven.modrinth:villager-recruits:${recruits_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {

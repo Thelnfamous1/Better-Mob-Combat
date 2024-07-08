@@ -1,4 +1,4 @@
-package me.Thelnfamous1.bettermobcombat.mixin.compat;
+package me.Thelnfamous1.bettermobcombat.mixin.compat.guardvillagers;
 
 import me.Thelnfamous1.bettermobcombat.mixin.MeleeAttackGoalMixin;
 import net.minecraft.world.entity.LivingEntity;

@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import me.Thelnfamous1.bettermobcombat.BetterMobCombat;
 import me.Thelnfamous1.bettermobcombat.Constants;
 import me.Thelnfamous1.bettermobcombat.api.MobAttackRangeExtensions;
+import me.Thelnfamous1.bettermobcombat.api.MobAttackWindup;
 import me.Thelnfamous1.bettermobcombat.mixin.MobAccessor;
 import me.Thelnfamous1.bettermobcombat.mixin.ServerNetworkAccessor;
 import net.bettercombat.BetterCombat;
@@ -39,7 +40,9 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
+import java.util.function.Supplier;
 
 public class MobCombatHelper {
 
@@ -70,6 +73,17 @@ public class MobCombatHelper {
             return predicate.test(mob, attributes);
         }
         return false;
+    }
+
+    public static <T> T applyWithBetterCombatWeapon(Mob mob, BiFunction<Mob, WeaponAttributes, T> function, Supplier<T> defaultValue) {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(mob)){
+            return defaultValue.get();
+        }
+        WeaponAttributes attributes = WeaponRegistry.getAttributes(mob.getMainHandItem());
+        if (attributes != null && attributes.attacks() != null) {
+            return function.apply(mob, attributes);
+        }
+        return defaultValue.get();
     }
 
     public static void processAttack(Level world, Mob mob, int comboCount, List<Entity> targets){
@@ -229,5 +243,9 @@ public class MobCombatHelper {
         return (new MobTargetFinder.CollisionFilter(obb))
                 .and(new MobTargetFinder.RadialFilter(origin, obb.axisZ, attackRange, attack.angle()))
                 .test(target, mob);
+    }
+
+    public static boolean isAttackReady(Mob mob) {
+        return ((MobAttackWindup) mob).bettermobcombat$getAttackCooldown() <= 0;
     }
 }

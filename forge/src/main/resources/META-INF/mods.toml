@@ -54,3 +54,9 @@ mandatory = false
 versionRange = "${guard_villagers_version_range}"
 ordering = "NONE"
 side = "BOTH"
+[[dependencies.${mod_id}]]
+modId = "recruits"
+mandatory = false
+versionRange = "${recruits_version_range}"
+ordering = "NONE"
+side = "BOTH"

@@ -33,7 +33,7 @@ public abstract class MeleeAttackMixin {
             if(currentAttack != null){
                 LivingEntity target = (LivingEntity)instance.get(attackTarget);
                 if(!isHoldingUsableProjectileWeapon(m)
-                        && ((MobAttackWindup)m).bettermobcombat$getAttackCooldown() >= 0
+                        && MobCombatHelper.isAttackReady(m)
                         && m.isWithinMeleeAttackRange(target)
                         && ((NearestVisibleLivingEntities)instance.get(nvle)).contains(target)){
                     ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);

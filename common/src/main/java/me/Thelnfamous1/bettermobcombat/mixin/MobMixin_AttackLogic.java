@@ -221,7 +221,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             method = {"tick"},
             at = {@At("TAIL")}
     )
-    public void post_tick(CallbackInfo ci) {
+    private void post_tick(CallbackInfo ci) {
         if (this.level().isClientSide) {
             ((PlayerAttackAnimatable) this).updateAnimationsOnTick();
         }
@@ -316,7 +316,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             at = {@At("HEAD")},
             cancellable = true
     )
-    public void pre_getItemBySlot(EquipmentSlot slot, CallbackInfoReturnable<ItemStack> cir) {
+    private void pre_getItemBySlot(EquipmentSlot slot, CallbackInfoReturnable<ItemStack> cir) {
         if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
             return;
         }
@@ -348,7 +348,12 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             ),
             index = 0
     )
-    public ItemStack modify_getDamageBonus_doHurtTarget(ItemStack heldItem) {
+    private ItemStack modify_getDamageBonus_doHurtTarget(ItemStack heldItem) {
+        return this.bettermobcombat$getAlternateMainhandItem(heldItem);
+    }
+
+    @Unique
+    protected ItemStack bettermobcombat$getAlternateMainhandItem(ItemStack heldItem) {
         Mob mob = (Mob) (Object) this;
         AttackHand currentHand = MobAttackHelper.getCurrentAttack(mob, this.bettermobcombat$comboCount);
         if (currentHand != null) {
@@ -365,7 +370,12 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
                     target = "Lnet/minecraft/world/entity/Mob;getMainHandItem()Lnet/minecraft/world/item/ItemStack;"
             )
     )
-    public ItemStack wrap_getMainHandItem_doHurtTarget(Mob instance, Operation<ItemStack> original) {
+    private ItemStack wrap_getMainHandItem_doHurtTarget(Mob instance, Operation<ItemStack> original) {
+        return this.bettermobcombat$getAlternateMainHandItem(instance, original);
+    }
+
+    @Unique
+    protected ItemStack bettermobcombat$getAlternateMainHandItem(Mob instance, Operation<ItemStack> original) {
         if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
             return original.call(instance);
         }
@@ -391,7 +401,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
                     target = "Lnet/minecraft/entity/player/PlayerEntity;setStackInHand(Lnet/minecraft/util/Hand;Lnet/minecraft/item/ItemStack;)V"
             )
     )
-    public void setStackInHand_Redirect(Player instance, InteractionHand handArg, ItemStack itemStack) {
+    private void setStackInHand_Redirect(Player instance, InteractionHand handArg, ItemStack itemStack) {
         if (this.comboCount < 0) {
             instance.setItemInHand(handArg, itemStack);
         }
