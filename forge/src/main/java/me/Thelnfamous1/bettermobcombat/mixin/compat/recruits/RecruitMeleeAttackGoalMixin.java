@@ -17,12 +17,14 @@ public abstract class RecruitMeleeAttackGoalMixin {
 
     @Shadow @Final protected AbstractRecruitEntity recruit;
 
-    @WrapOperation(method = "canUse", at = @At(value = "INVOKE", target = "Lcom/talhanation/recruits/util/AttackUtil;getAttackReachSqr(Lnet/minecraft/world/entity/LivingEntity;)D"))
+    @WrapOperation(method = "canUse", remap = true, at = @At(value = "INVOKE",
+            target = "Lcom/talhanation/recruits/util/AttackUtil;getAttackReachSqr(Lnet/minecraft/world/entity/LivingEntity;)D", remap = false))
     private double wrap_getAttackReachSqr_canUse(LivingEntity attacker, Operation<Double> original){
         return this.bettermobcombat$wrapGetAttackReachSqr(attacker, original);
     }
 
-    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lcom/talhanation/recruits/util/AttackUtil;getAttackReachSqr(Lnet/minecraft/world/entity/LivingEntity;)D"))
+    @WrapOperation(method = "tick", remap = true, at = @At(value = "INVOKE",
+            target = "Lcom/talhanation/recruits/util/AttackUtil;getAttackReachSqr(Lnet/minecraft/world/entity/LivingEntity;)D", remap = false))
     private double wrap_getAttackReachSqr_tick(LivingEntity attacker, Operation<Double> original){
         return this.bettermobcombat$wrapGetAttackReachSqr(attacker, original);
     }
