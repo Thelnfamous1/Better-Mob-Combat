@@ -12,9 +12,7 @@ import me.shedaniel.autoconfig.ConfigHolder;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import me.shedaniel.autoconfig.serializer.PartitioningSerializer;
 import net.bettercombat.api.AttackHand;
-import net.bettercombat.api.client.BetterCombatClientEvents;
 import net.bettercombat.logic.AnimatedHand;
-import net.bettercombat.logic.PlayerAttackHelper;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -48,7 +46,6 @@ public class BetterMobCombat {
         updateServerConfig(configHolder.getConfig().server, false);
 
         BetterMobCombatEvents.ATTACK_START.register((mob, attackHand) -> debugTriggeredAttack(mob, attackHand, MobAttackHelper::getAttackCooldownTicksCapped));
-        BetterCombatClientEvents.ATTACK_START.register((player, attackHand) -> debugTriggeredAttack(player, attackHand, PlayerAttackHelper::getAttackCooldownTicksCapped));
 
         BMCCompatibilityFlags.initialize();
     }
@@ -59,7 +56,7 @@ public class BetterMobCombat {
         return InteractionResult.PASS;
     }
 
-    private static <T extends LivingEntity> void debugTriggeredAttack(T entity, AttackHand attackHand, Function<T, Float> attackCooldownGetter) {
+    public static <T extends LivingEntity> void debugTriggeredAttack(T entity, AttackHand attackHand, Function<T, Float> attackCooldownGetter) {
         float upswingRate = (float) attackHand.upswingRate();
         float attackCooldownTicksFloat = attackCooldownGetter.apply(entity);
         String animationName = attackHand.attack().animation();

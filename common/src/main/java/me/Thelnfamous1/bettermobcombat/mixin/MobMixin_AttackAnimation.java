@@ -11,11 +11,11 @@ import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
 import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
+import me.Thelnfamous1.bettermobcombat.BetterMobCombatClient;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
 import net.bettercombat.BetterCombat;
 import net.bettercombat.api.WeaponAttributes;
-import net.bettercombat.client.BetterCombatClient;
 import net.bettercombat.client.animation.*;
 import net.bettercombat.client.animation.modifier.HarshAdjustmentModifier;
 import net.bettercombat.client.animation.modifier.TransmissionSpeedModifier;
@@ -150,6 +150,9 @@ public abstract class MobMixin_AttackAnimation extends LivingEntity implements P
 
     @Override
     public void updateAnimationsOnTick() {
+        if(!this.level().isClientSide){
+            return;
+        }
         boolean isLeftHanded = this.isLeftHanded();
         boolean hasActiveAttackAnimation = this.bettermobcombat$attackAnimation.base.getAnimation() != null && this.bettermobcombat$attackAnimation.base.getAnimation().isActive();
         ItemStack mainHandStack = this.getMainHandItem();
@@ -198,6 +201,9 @@ public abstract class MobMixin_AttackAnimation extends LivingEntity implements P
 
     @Override
     public void playAttackAnimation(String name, AnimatedHand animatedHand, float length, float upswing) {
+        if(!this.level().isClientSide){
+            return;
+        }
         try {
             KeyframeAnimation animation = AnimationRegistry.animations.get(name);
             KeyframeAnimation.AnimationBuilder copy = animation.mutableCopy();
@@ -227,9 +233,9 @@ public abstract class MobMixin_AttackAnimation extends LivingEntity implements P
     @Unique
     private FirstPersonConfiguration bettermobcombat$firstPersonConfig(AnimatedHand animatedHand) {
         boolean showRightItem = true;
-        boolean showLeftItem = BetterCombatClient.config.isShowingOtherHandFirstPerson || animatedHand == AnimatedHand.TWO_HANDED;
-        boolean showRightArm = showRightItem && BetterCombatClient.config.isShowingArmsInFirstPerson;
-        boolean showLeftArm = showLeftItem && BetterCombatClient.config.isShowingArmsInFirstPerson;
+        boolean showLeftItem = BetterMobCombatClient.getBetterCombatClientConfig().isShowingOtherHandFirstPerson || animatedHand == AnimatedHand.TWO_HANDED;
+        boolean showRightArm = showRightItem && BetterMobCombatClient.getBetterCombatClientConfig().isShowingArmsInFirstPerson;
+        boolean showLeftArm = showLeftItem && BetterMobCombatClient.getBetterCombatClientConfig().isShowingArmsInFirstPerson;
         FirstPersonConfiguration config = new FirstPersonConfiguration(showRightArm, showLeftArm, showRightItem, showLeftItem);
         return config;
     }
@@ -264,6 +270,9 @@ public abstract class MobMixin_AttackAnimation extends LivingEntity implements P
 
     @Override
     public void stopAttackAnimation(float length) {
+        if(!this.level().isClientSide){
+            return;
+        }
         IAnimation currentAnimation = this.bettermobcombat$attackAnimation.base.getAnimation();
         if (currentAnimation != null && currentAnimation instanceof KeyframeAnimationPlayer) {
             int fadeOut = Math.round(length);
