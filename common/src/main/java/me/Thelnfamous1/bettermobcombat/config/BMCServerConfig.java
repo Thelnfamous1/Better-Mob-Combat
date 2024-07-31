@@ -32,24 +32,31 @@ public class BMCServerConfig implements ConfigData {
     @Comment("Determines if mobs that are assigned to scoreboard teams will  only respect scoreboard team ally checks and ignore any Better Combat target relation checks.")
     public boolean team_mobs_only_respect_teams = false;
     @Comment("Relations determine when mobs' undirected weapon swings (cleaves) will hurt another entity (target).\n- `FRIENDLY` - The target can never be damaged by the mob.\n- `NEUTRAL` - The target can be damaged only if the mob is directly targeting it.\n- `HOSTILE` - The target can be damaged if located within the weapon swing area.\n(NOTE: Vanilla sweeping can still hit targets, if not disabled via `allow_sweeping`)\n\nThe various relation related configs are being checked in the following order:\n- `mob_relations`\n- `mob_relations_to_passives`\n- `mob_relations_to_hostiles`\n- `mob_relations_to_other`\n(The first relation to be found for the target will be applied. If no relation is found, it will default to HOSTILE.)\n")
-    public LinkedHashMap<String, LinkedHashMap<String, TargetHelper.Relation>> mob_relations = new LinkedHashMap<String, LinkedHashMap<String, TargetHelper.Relation>>() {
-        {
-            this.put("guardvillagers:guard", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-            this.put("recruits:recruit", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-            this.put("recruits:bowman", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-            this.put("recruits:recruit_shieldman", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-            this.put("recruits:nomad", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-            this.put("recruits:horseman", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-            this.put("minecraft:piglin", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultPiglinRelations));
-            this.put("minecraft:piglin_brute", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultPiglinRelations));
-            this.put("minecraft:evoker", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
-            this.put("minecraft:illusioner", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
-            this.put("minecraft:pillager", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
-            this.put("minecraft:vindicator", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
-            this.put("minecraft:zombified_piglin", Util.make(new LinkedHashMap<>(), map -> map.put("minecraft:zombified_piglin", TargetHelper.Relation.NEUTRAL)));
-        }
-    };
+    public LinkedHashMap<String, LinkedHashMap<String, TargetHelper.Relation>> mob_relations = new LinkedHashMap<String, LinkedHashMap<String, TargetHelper.Relation>>();
 
+
+    @Comment("Relation to unspecified entities that are instances of PassiveEntity(Yarn)/AgeableEntity(Mojmap)")
+    public LinkedHashMap<String, TargetHelper.Relation> mob_relations_to_passives = new LinkedHashMap<String, TargetHelper.Relation>();
+    @Comment("Relation to unspecified entities that are instances of HostileEntity(Yarn)/MonsterEntity(Mojmap)")
+    public LinkedHashMap<String, TargetHelper.Relation> mob_relations_to_hostiles = new LinkedHashMap<String, TargetHelper.Relation>();
+    @Comment("Fallback relation")
+    public LinkedHashMap<String, TargetHelper.Relation> mob_relations_to_other = new LinkedHashMap<String, TargetHelper.Relation>();
+
+    public BMCServerConfig() {
+        this.mob_relations.put("guardvillagers:guard", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
+        this.mob_relations.put("recruits:recruit", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
+        this.mob_relations.put("recruits:bowman", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
+        this.mob_relations.put("recruits:recruit_shieldman", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
+        this.mob_relations.put("recruits:nomad", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
+        this.mob_relations.put("recruits:horseman", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
+        this.mob_relations.put("minecraft:piglin", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultPiglinRelations));
+        this.mob_relations.put("minecraft:piglin_brute", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultPiglinRelations));
+        this.mob_relations.put("minecraft:evoker", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
+        this.mob_relations.put("minecraft:illusioner", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
+        this.mob_relations.put("minecraft:pillager", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
+        this.mob_relations.put("minecraft:vindicator", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
+        this.mob_relations.put("minecraft:zombified_piglin", Util.make(new LinkedHashMap<>(), map -> map.put("minecraft:zombified_piglin", TargetHelper.Relation.NEUTRAL)));
+    }
     private static void addDefaultIllagerRelations(LinkedHashMap<String, TargetHelper.Relation> map) {
         map.put("minecraft:evoker", TargetHelper.Relation.NEUTRAL);
         map.put("minecraft:illusioner", TargetHelper.Relation.NEUTRAL);
@@ -71,16 +78,6 @@ public class BMCServerConfig implements ConfigData {
     private static void addDefaultPiglinRelations(LinkedHashMap<String, TargetHelper.Relation> map) {
         map.put("minecraft:piglin", TargetHelper.Relation.NEUTRAL);
         map.put("minecraft:piglin_brute", TargetHelper.Relation.NEUTRAL);
-    }
-
-    @Comment("Relation to unspecified entities that are instances of PassiveEntity(Yarn)/AgeableEntity(Mojmap)")
-    public LinkedHashMap<String, TargetHelper.Relation> mob_relations_to_passives = new LinkedHashMap<String, TargetHelper.Relation>();
-    @Comment("Relation to unspecified entities that are instances of HostileEntity(Yarn)/MonsterEntity(Mojmap)")
-    public LinkedHashMap<String, TargetHelper.Relation> mob_relations_to_hostiles = new LinkedHashMap<String, TargetHelper.Relation>();
-    @Comment("Fallback relation")
-    public LinkedHashMap<String, TargetHelper.Relation> mob_relations_to_other = new LinkedHashMap<String, TargetHelper.Relation>();
-
-    public BMCServerConfig() {
     }
 
     public static BMCServerConfig deserialize(String json) {

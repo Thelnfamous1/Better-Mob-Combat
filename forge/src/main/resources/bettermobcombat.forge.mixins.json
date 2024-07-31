@@ -10,7 +10,8 @@
     "compat.recruits.AttackUtilMixin",
     "compat.recruits.HorsemanAttackAIMixin",
     "compat.recruits.PillagerMeleeAttackGoalMixin",
-    "compat.recruits.RecruitMeleeAttackGoalMixin"
+    "compat.recruits.RecruitMeleeAttackGoalMixin",
+    "compat.recruits.UseShieldMixin"
   ],
   "client": [
   ],
