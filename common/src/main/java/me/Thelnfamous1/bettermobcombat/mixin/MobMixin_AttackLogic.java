@@ -75,8 +75,6 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     private float bettermobcombat$lastSwingDuration = 0.0F;
     @Unique
     private int bettermobcombat$comboReset = 0;
-    @Unique
-    private List<Entity> bettermobcombat$targetsInReach = null;
 
     protected MobMixin_AttackLogic(EntityType<? extends LivingEntity> $$0, Level $$1) {
         super($$0, $$1);
@@ -91,11 +89,9 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             if (this.bettermobcombat$attackCooldown > 0) {
                 --this.bettermobcombat$attackCooldown;
             }
-            this.bettermobcombat$targetsInReach = null;
             ++this.bettermobcombat$lastAttacked;
             this.bettermobcombat$cancelSwingIfNeeded();
             this.bettermobcombat$attackFromUpswingIfNeeded();
-            this.bettermobcombat$updateTargetsIfNeeded();
             this.bettermobcombat$resetComboIfNeeded();
         }
     }
@@ -149,9 +145,8 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             double upswingRate = hand.upswingRate();
             if (!(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - upswingRate)) {
                 Entity intendedTarget = this.getTarget();
-                List<Entity> targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), null, attack, hand.attributes().attackRange());
-                this.bettermobcombat$updateTargetsInReach(targets);
-                if (intendedTarget == null && targets.size() == 0) {
+                List<Entity> targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), this.getTarget(), attack, hand.attributes().attackRange());
+                if (intendedTarget == null && targets.isEmpty()) {
                     Constants.LOG.debug("Mob {} executed an attack with no AI attack target and no targets in range", this);
                     // PlatformClient.onEmptyLeftClick(((Mob)(Object)this));
                 }
@@ -175,34 +170,6 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     @Nullable
     private AttackHand bettermobcombat$getCurrentHand() {
         return MobAttackHelper.getCurrentAttack(((Mob) (Object) this), this.getComboCount());
-    }
-
-    @Unique
-    private void bettermobcombat$updateTargetsInReach(List<Entity> targets) {
-        this.bettermobcombat$targetsInReach = targets;
-    }
-
-    @Unique
-    private void bettermobcombat$updateTargetsIfNeeded() {
-        if (this.bettermobcombat$shouldUpdateTargetsInReach()) {
-            AttackHand hand = MobAttackHelper.getCurrentAttack(this, this.getComboCount());
-            WeaponAttributes attributes = WeaponRegistry.getAttributes(this.getMainHandItem());
-            List<Entity> targets = List.of();
-            if (attributes != null && attributes.attacks() != null) {
-                targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), this.getTarget(), hand.attack(), attributes.attackRange());
-            }
-
-            this.bettermobcombat$updateTargetsInReach(targets);
-        }
-
-    }
-
-    @Unique
-    private boolean bettermobcombat$shouldUpdateTargetsInReach() {
-        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
-            return false;
-        }
-        return !this.level().isClientSide && this.getTarget() != null && this.bettermobcombat$targetsInReach == null;
     }
 
     @Unique
@@ -286,8 +253,8 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
                         multiplier = (float)(1.0 - (1.0 - multiplier) * p2);
                     }
 
-                    this.zza *= multiplier;
-                    this.xxa *= multiplier;
+                    this.zza *= (float) multiplier;
+                    this.xxa *= (float) multiplier;
                 }
 
             }
@@ -456,11 +423,6 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
         } else{
             Constants.LOG.error("Upswing did not start for {} due to lack of AttackHand", this);
         }
-    }
-
-    @Unique
-    public boolean bettermobcombat$hasTargetsInReach() {
-        return this.bettermobcombat$targetsInReach != null && !this.bettermobcombat$targetsInReach.isEmpty();
     }
 
     // EntityPlayer_BetterCombat

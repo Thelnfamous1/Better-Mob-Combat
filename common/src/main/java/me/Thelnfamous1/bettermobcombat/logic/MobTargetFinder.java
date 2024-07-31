@@ -31,9 +31,9 @@ public class MobTargetFinder {
     public MobTargetFinder() {
     }
 
-    public static TargetFinder.TargetResult findAttackTargetResult(LivingEntity mob, @Nullable Entity cursorTarget, WeaponAttributes.Attack attack, double attackRange) {
+    public static TargetFinder.TargetResult findAttackTargetResult(LivingEntity mob, @Nullable Entity intendedTarget, WeaponAttributes.Attack attack, double attackRange) {
         Vec3 origin = getInitialTracingPoint(mob);
-        List<Entity> entities = getInitialTargets(mob, cursorTarget, attackRange);
+        List<Entity> entities = getInitialTargets(mob, intendedTarget, attackRange);
         if (!MobAttackRangeExtensions.sources().isEmpty()) {
             attackRange = applyAttackRangeModifiers(mob, attackRange);
         }
@@ -68,8 +68,8 @@ public class MobTargetFinder {
         return result;
     }
 
-    public static List<Entity> findAttackTargets(LivingEntity mob, @Nullable Entity cursorTarget, WeaponAttributes.Attack attack, double attackRange) {
-        return findAttackTargetResult(mob, cursorTarget, attack, attackRange).entities;
+    public static List<Entity> findAttackTargets(LivingEntity mob, @Nullable Entity intendedTarget, WeaponAttributes.Attack attack, double attackRange) {
+        return findAttackTargetResult(mob, intendedTarget, attack, attackRange).entities;
     }
 
     public static Vec3 getInitialTracingPoint(LivingEntity mob) {
@@ -77,14 +77,22 @@ public class MobTargetFinder {
         return mob.getEyePosition().subtract(0.0, shoulderHeight, 0.0);
     }
 
-    public static List<Entity> getInitialTargets(LivingEntity mob, @Nullable Entity cursorTarget, double attackRange) {
+    public static List<Entity> getInitialTargets(LivingEntity mob, @Nullable Entity intendedTarget, double attackRange) {
         AABB box = mob.getBoundingBox().inflate(attackRange * (double)BetterCombat.config.target_search_range_multiplier + 1.0);
-        List<Entity> entities = mob.level().getEntities(mob, box, (entity) -> !entity.isSpectator() && entity.isPickable()).stream().filter((entity) -> entity != mob && entity != cursorTarget && entity.isAttackable() && (!entity.equals(mob.getVehicle()) || TargetHelper.isAttackableMount(entity)) && MobTargetHelper.getRelation(mob, entity) == Relation.HOSTILE).collect(Collectors.toList());
-        if (cursorTarget != null && cursorTarget.isAttackable()) {
-            entities.add(cursorTarget);
+        List<Entity> detectedEntities = mob.level().getEntities(mob, box, (entity) -> !entity.isSpectator() && entity.isPickable());
+        List<Entity> targetableEntities = detectedEntities
+                .stream()
+                .filter((entity) -> entity != mob
+                        && entity != intendedTarget
+                        && entity.isAttackable()
+                        && (!entity.equals(mob.getVehicle()) || TargetHelper.isAttackableMount(entity))
+                        && MobTargetHelper.getRelation(mob, entity) == Relation.HOSTILE)
+                .collect(Collectors.toList());
+        if (intendedTarget != null && intendedTarget.isAttackable() && detectedEntities.contains(intendedTarget)) {
+            targetableEntities.add(intendedTarget);
         }
 
-        return entities;
+        return targetableEntities;
     }
 
     public static class CollisionFilter implements Filter {
