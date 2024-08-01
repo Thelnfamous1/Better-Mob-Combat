@@ -27,24 +27,32 @@ public class MobTargetHelper {
             if (target instanceof HangingEntity) {
                 return TargetHelper.Relation.NEUTRAL;
             } else {
-                if(BetterMobCombat.getServerConfig().mobs_check_for_vanilla_allies && attacker.isAlliedTo(target)){
-                    return TargetHelper.Relation.FRIENDLY;
-                } else if(attacker.getTeam() != null){
+                if(attacker.getTeam() != null){
                     if(attacker.getTeam().isAlliedTo(target.getTeam())) {
                         return TargetHelper.Relation.FRIENDLY;
                     } else if(BetterMobCombat.getServerConfig().team_mobs_only_respect_teams){
                         return TargetHelper.Relation.HOSTILE;
                     }
                 }
-                TargetHelper.Relation relationToTarget = BetterMobCombat.getServerConfigHelper().getMobRelation(attacker.getType(), target.getType());
-                if (relationToTarget != null) {
-                    return relationToTarget;
-                } else if (target instanceof AgeableMob) {
-                    return TargetHelper.Relation.coalesce(BetterMobCombat.getServerConfigHelper().getMobRelationToPassives(attacker.getType()), TargetHelper.Relation.HOSTILE);
+                // continue to the rest of the checks
+                if(BetterMobCombat.getServerConfig().mobs_check_for_vanilla_allies && attacker.isAlliedTo(target)){
+                    return TargetHelper.Relation.FRIENDLY;
+                } else if(BetterMobCombat.getServerConfig().mobs_check_for_same_entity_type && attacker.getType().equals(target.getType())){
+                    return TargetHelper.Relation.FRIENDLY;
+                } else if(BetterMobCombat.getServerConfig().mobs_check_for_same_mob_type
+                        && target instanceof LivingEntity livingTarget && attacker.getMobType().equals(livingTarget.getMobType())){
+                    return TargetHelper.Relation.FRIENDLY;
                 } else {
-                    return target instanceof Monster ?
-                            TargetHelper.Relation.coalesce(BetterMobCombat.getServerConfigHelper().getMobRelationToHostiles(attacker.getType()), TargetHelper.Relation.HOSTILE) :
-                            TargetHelper.Relation.coalesce(BetterMobCombat.getServerConfigHelper().getMobRelationToOther(attacker.getType()), TargetHelper.Relation.HOSTILE);
+                    TargetHelper.Relation relationToTarget = BetterMobCombat.getServerConfigHelper().getMobRelation(attacker.getType(), target.getType());
+                    if (relationToTarget != null) {
+                        return relationToTarget;
+                    } else if (target instanceof AgeableMob) {
+                        return TargetHelper.Relation.coalesce(BetterMobCombat.getServerConfigHelper().getMobRelationToPassives(attacker.getType()), TargetHelper.Relation.HOSTILE);
+                    } else {
+                        return target instanceof Monster ?
+                                TargetHelper.Relation.coalesce(BetterMobCombat.getServerConfigHelper().getMobRelationToHostiles(attacker.getType()), TargetHelper.Relation.HOSTILE) :
+                                TargetHelper.Relation.coalesce(BetterMobCombat.getServerConfigHelper().getMobRelationToOther(attacker.getType()), TargetHelper.Relation.HOSTILE);
+                    }
                 }
             }
         }

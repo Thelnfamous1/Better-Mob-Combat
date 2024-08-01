@@ -1,6 +1,7 @@
 package me.Thelnfamous1.bettermobcombat.config;
 
 import com.google.gson.Gson;
+import com.mojang.serialization.JsonOps;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
@@ -27,12 +28,31 @@ public class BMCServerConfig implements ConfigData {
     public boolean mob_blacklist_as_whitelist = false;
     @Comment("Automatically blacklists mobs detected to be using a GeckoLib model from using the Better Combat system. \nGeckoLib models are not supported by Mob Player Animator, and therefore won't animate Better Combat attacks.")
     public boolean geckolib_mobs_blacklisted = true;
-    @Comment("Allows mobs to perform the vanilla check for allies. This allows for certain mobs, such as Illagers, to recognize each other as natural allies if neither they nor their target are assigned to scoreboard teams. \nIf this check fails, the system will fallback to a scoreboard team ally check, followed by the specified Better Combat target relation checks.")
-    public boolean mobs_check_for_vanilla_allies = true;
-    @Comment("Determines if mobs that are assigned to scoreboard teams will  only respect scoreboard team ally checks and ignore any Better Combat target relation checks.")
+    @Comment("Determines if mobs that are assigned to scoreboard teams will only respect scoreboard team ally checks and ignore any other checks.")
     public boolean team_mobs_only_respect_teams = false;
+    @Comment("Allows mobs to perform the vanilla check for allies. This allows for certain mobs, such as Illagers, to recognize each other as natural allies. \nIf this check fails or is disabled, the system will move on to entity type checks.")
+    public boolean mobs_check_for_vanilla_allies = true;
+    @Comment("Allows mobs to check if they are the same entity type as the target. This allows for mobs with identical entity types (such as two Zombified Piglins) to recognize each other as natural allies. \nIf this check fails or is disabled, the system will move on to mob type checks.")
+    public boolean mobs_check_for_same_entity_type = true;
+    @Comment("Allows mobs to check if they are the same mob type as the target. This allows for mobs with identical mob types (such as two Undead) to recognize each other as natural allies. \nIf this check fails or is disabled, the system will move on to Better Mob Combat target relation checks.")
+    public boolean mobs_check_for_same_mob_type = true;
     @Comment("Relations determine when mobs' undirected weapon swings (cleaves) will hurt another entity (target).\n- `FRIENDLY` - The target can never be damaged by the mob.\n- `NEUTRAL` - The target can be damaged only if the mob is directly targeting it.\n- `HOSTILE` - The target can be damaged if located within the weapon swing area.\n(NOTE: Vanilla sweeping can still hit targets, if not disabled via `allow_sweeping`)\n\nThe various relation related configs are being checked in the following order:\n- `mob_relations`\n- `mob_relations_to_passives`\n- `mob_relations_to_hostiles`\n- `mob_relations_to_other`\n(The first relation to be found for the target will be applied. If no relation is found, it will default to HOSTILE.)\n")
-    public LinkedHashMap<String, LinkedHashMap<String, TargetHelper.Relation>> mob_relations = new LinkedHashMap<String, LinkedHashMap<String, TargetHelper.Relation>>();
+    public LinkedHashMap<String, String> mob_relations = new LinkedHashMap<String, String>() {
+        {
+            this.put("guardvillagers:guard", encodeMobRelationMap(Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations)));
+            this.put("recruits:recruit", encodeMobRelationMap(Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations)));
+            this.put("recruits:bowman", encodeMobRelationMap(Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations)));
+            this.put("recruits:recruit_shieldman", encodeMobRelationMap(Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations)));
+            this.put("recruits:nomad", encodeMobRelationMap(Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations)));
+            this.put("recruits:horseman", encodeMobRelationMap(Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations)));
+            this.put("minecraft:piglin", encodeMobRelationMap(Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultPiglinRelations)));
+            this.put("minecraft:piglin_brute", encodeMobRelationMap(Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultPiglinRelations)));
+        }
+    };
+
+    private static String encodeMobRelationMap(LinkedHashMap<String, TargetHelper.Relation> input) {
+        return BMCServerConfigHelper.MOB_RELATIONS_STRING_CODEC.encodeStart(JsonOps.INSTANCE, input).result().get().toString();
+    }
 
 
     @Comment("Relation to unspecified entities that are instances of PassiveEntity(Yarn)/AgeableEntity(Mojmap)")
@@ -43,25 +63,6 @@ public class BMCServerConfig implements ConfigData {
     public LinkedHashMap<String, TargetHelper.Relation> mob_relations_to_other = new LinkedHashMap<String, TargetHelper.Relation>();
 
     public BMCServerConfig() {
-        this.mob_relations.put("guardvillagers:guard", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-        this.mob_relations.put("recruits:recruit", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-        this.mob_relations.put("recruits:bowman", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-        this.mob_relations.put("recruits:recruit_shieldman", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-        this.mob_relations.put("recruits:nomad", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-        this.mob_relations.put("recruits:horseman", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations));
-        this.mob_relations.put("minecraft:piglin", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultPiglinRelations));
-        this.mob_relations.put("minecraft:piglin_brute", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultPiglinRelations));
-        this.mob_relations.put("minecraft:evoker", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
-        this.mob_relations.put("minecraft:illusioner", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
-        this.mob_relations.put("minecraft:pillager", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
-        this.mob_relations.put("minecraft:vindicator", Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultIllagerRelations));
-        this.mob_relations.put("minecraft:zombified_piglin", Util.make(new LinkedHashMap<>(), map -> map.put("minecraft:zombified_piglin", TargetHelper.Relation.NEUTRAL)));
-    }
-    private static void addDefaultIllagerRelations(LinkedHashMap<String, TargetHelper.Relation> map) {
-        map.put("minecraft:evoker", TargetHelper.Relation.NEUTRAL);
-        map.put("minecraft:illusioner", TargetHelper.Relation.NEUTRAL);
-        map.put("minecraft:pillager", TargetHelper.Relation.NEUTRAL);
-        map.put("minecraft:vindicator", TargetHelper.Relation.NEUTRAL);
     }
 
     private static void addDefaultVillagerAllyRelations(LinkedHashMap<String, TargetHelper.Relation> map) {

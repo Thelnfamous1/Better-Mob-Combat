@@ -1,5 +1,11 @@
 package me.Thelnfamous1.bettermobcombat.config;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 import me.Thelnfamous1.bettermobcombat.Constants;
 import me.Thelnfamous1.bettermobcombat.compatibility.BMCCompatibilityFlags;
 import me.Thelnfamous1.bettermobcombat.compatibility.GeckolibHelper;
@@ -13,12 +19,16 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class BMCServerConfigHelper {
+    public static final Codec<TargetHelper.Relation> RELATION_CODEC = Codec.STRING.comapFlatMap(BMCServerConfigHelper::readRelation, Enum::name).stable();
+    public static final Codec<Map<EntityType<?>, TargetHelper.Relation>> MOB_RELATIONS_CODEC = Codec.unboundedMap(BuiltInRegistries.ENTITY_TYPE.byNameCodec(), RELATION_CODEC);
+    public static final Codec<Map<String, TargetHelper.Relation>> MOB_RELATIONS_STRING_CODEC = Codec.unboundedMap(Codec.STRING, RELATION_CODEC);
     private final BMCServerConfig serverConfig;
     private final Set<EntityType<?>> mobBlacklist = new HashSet<>();
     private final Map<EntityType<?>, Map<EntityType<?>, TargetHelper.Relation>> mobRelations = new HashMap<>();
     private final Map<EntityType<?>, TargetHelper.Relation> mobRelationsToPassives = new HashMap<>();
     private final Map<EntityType<?>, TargetHelper.Relation> mobRelationsToHostiles = new HashMap<>();
     private final Map<EntityType<?>, TargetHelper.Relation> mobRelationsToOther = new HashMap<>();
+
 
     public BMCServerConfigHelper(BMCServerConfig serverConfig, boolean log){
         this.serverConfig = serverConfig;
@@ -38,26 +48,44 @@ public class BMCServerConfigHelper {
             }
         }
         // mob relations
-        for(Map.Entry<String, LinkedHashMap<String, TargetHelper.Relation>> entry : serverConfig.mob_relations.entrySet()){
-            ResourceLocation id = ResourceLocation.tryParse(entry.getKey());
-            if(id == null){
-                if(log) Constants.LOG.error("Could not parse mob relations entry key {}, not a valid namespaced id", entry.getKey());
-            } else{
-                Optional<EntityType<?>> entityTypeKey = BuiltInRegistries.ENTITY_TYPE.getOptional(id);
-                entityTypeKey.ifPresentOrElse(etk -> {
-                    Map<String, TargetHelper.Relation> relations = entry.getValue();
-                    parseMobRelations(relations, this.mobRelations.computeIfAbsent(etk, k -> new HashMap<>()), id + " mob_relations map", log);
-                }, () -> {
-                    if(log) Constants.LOG.error("Could not find mob relations entry key {}, not a valid entity type", id);
-                });
+        serverConfig.mob_relations.forEach((key, value) -> {
+            Codec<? extends EntityType<?>> resourceLocationToEntityType = getResourceLocationToEntityTypeCodec();
+            EntityType<?> entityType = resourceLocationToEntityType.parse(JsonOps.INSTANCE, new JsonPrimitive(key)).result().orElse(null);
+            if(entityType == null) {
+                if(log) Constants.LOG.error("Could not parse {} entry key {}, not a valid namespaced id", "mob_relations", key);
+                return;
             }
-        }
+            Map<EntityType<?>, TargetHelper.Relation> modelModifier = MOB_RELATIONS_CODEC.parse(JsonOps.INSTANCE, new Gson().fromJson(value, JsonObject.class)).result().orElse(null);
+            if(modelModifier == null){
+                if(log) Constants.LOG.error("Could not parse {} entry value {} mapped to {}, not a valid map of entity types to target relations", "mob_relations", key, value);
+                return;
+            }
+            Constants.LOG.debug("Entered {}:{} into the " + "mob_relations" + " map!", key, value);
+            this.mobRelations.put(entityType, modelModifier);
+        });
         // mob relation to passives
         parseMobRelations(serverConfig.mob_relations_to_passives, this.mobRelationsToPassives, "mob_relations_to_passives map", log);
         // mob relation to hostiles
         parseMobRelations(serverConfig.mob_relations_to_hostiles, this.mobRelationsToHostiles, "mob_relations_to_hostiles", log);
         // mob relation to others
         parseMobRelations(serverConfig.mob_relations_to_other, this.mobRelationsToOther, "mob_relations_to_others", log);
+    }
+
+    private static Codec<? extends EntityType<?>> getResourceLocationToEntityTypeCodec() {
+        return ResourceLocation.CODEC.comapFlatMap(rl -> {
+            if (BuiltInRegistries.ENTITY_TYPE.containsKey(rl)) {
+                return DataResult.success(BuiltInRegistries.ENTITY_TYPE.get(rl));
+            }
+            return DataResult.error(() -> String.format("Could not parse %s, not a valid entity type", rl));
+        }, BuiltInRegistries.ENTITY_TYPE::getKey);
+    }
+
+    private static DataResult<TargetHelper.Relation> readRelation(String relation) {
+        try {
+            return DataResult.success(TargetHelper.Relation.valueOf(relation.toUpperCase(Locale.ROOT)));
+        } catch (Exception e) {
+            return DataResult.error(() -> "Not a valid target relation: " + relation);
+        }
     }
 
     private static void parseMobRelations(Map<String, TargetHelper.Relation> relationsToParse, Map<EntityType<?>, TargetHelper.Relation> mobRelationMap, String mapName, boolean log) {
