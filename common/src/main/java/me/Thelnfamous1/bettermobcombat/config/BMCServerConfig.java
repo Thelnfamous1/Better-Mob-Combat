@@ -36,7 +36,32 @@ public class BMCServerConfig implements ConfigData {
     public boolean mobs_check_for_same_entity_type = true;
     @Comment("Allows mobs to check if they are the same mob type as the target. This allows for mobs with identical mob types (such as two Undead) to recognize each other as natural allies. \nIf this check fails or is disabled, the system will move on to Better Mob Combat target relation checks.")
     public boolean mobs_check_for_same_mob_type = true;
-    @Comment("Relations determine when mobs' undirected weapon swings (cleaves) will hurt another entity (target).\n- `FRIENDLY` - The target can never be damaged by the mob.\n- `NEUTRAL` - The target can be damaged only if the mob is directly targeting it.\n- `HOSTILE` - The target can be damaged if located within the weapon swing area.\n(NOTE: Vanilla sweeping can still hit targets, if not disabled via `allow_sweeping`)\n\nThe various relation related configs are being checked in the following order:\n- `mob_relations`\n- `mob_relations_to_passives`\n- `mob_relations_to_hostiles`\n- `mob_relations_to_other`\n(The first relation to be found for the target will be applied. If no relation is found, it will default to HOSTILE.)\n")
+    @Comment("""
+            Relations determine when mobs' undirected weapon swings (cleaves) will hurt another entity (target).\
+
+            - `FRIENDLY` - The target can never be damaged by the mob.\
+
+            - `NEUTRAL` - The target can be damaged only if the mob is directly targeting it.\
+
+            - `HOSTILE` - The target can be damaged if located within the weapon swing area.\
+
+            (NOTE: Vanilla sweeping can still hit targets, if not disabled via `allow_sweeping`)\
+
+
+            The various relation related configs are being checked in the following order:\
+
+            - `mob_relations`
+            - `mob_relations_to_passives`\
+
+            - `mob_relations_to_hostiles`\
+
+            - `mob_relations_to_other`\
+
+            (The first relation to be found for the target will be applied. If no relation is found, it will default to HOSTILE.)\
+            
+            Refer to the wiki for formatting instructions: https://github.com/Thelnfamous1/Better-Mob-Combat/wiki/Mob-Relations. \n
+            Use a JSON validator such as https://jsonlint.com/ to ensure your JSON strings are correct.
+            """)
     public LinkedHashMap<String, String> mob_relations = new LinkedHashMap<String, String>() {
         {
             this.put("guardvillagers:guard", encodeMobRelationMap(Util.make(new LinkedHashMap<>(), BMCServerConfig::addDefaultVillagerAllyRelations)));
