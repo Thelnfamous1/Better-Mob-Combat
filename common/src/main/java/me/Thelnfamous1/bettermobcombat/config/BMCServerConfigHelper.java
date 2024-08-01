@@ -60,7 +60,7 @@ public class BMCServerConfigHelper {
                 if(log) Constants.LOG.error("Could not parse {} entry value {} mapped to {}, not a valid map of entity types to target relations", "mob_relations", key, value);
                 return;
             }
-            Constants.LOG.debug("Entered {}:{} into the " + "mob_relations" + " map!", key, value);
+            if(log) Constants.LOG.debug("Entered {}:{} into the " + "mob_relations" + " map!", key, value);
             this.mobRelations.put(entityType, modelModifier);
         });
         // mob relation to passives
