@@ -119,7 +119,9 @@ public class BMCServerConfigHelper {
 
     @Nullable
     public TargetHelper.Relation getMobRelation(EntityType<?> attackerType, EntityType<?> targetType) {
-        return this.mobRelations.get(attackerType).get(targetType);
+        Map<EntityType<?>, TargetHelper.Relation> relationsForMob = this.mobRelations.get(attackerType);
+        if(relationsForMob == null) return null;
+        return relationsForMob.get(targetType);
     }
 
     @Nullable
