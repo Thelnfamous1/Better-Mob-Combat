@@ -16,7 +16,11 @@
     "ServerNetworkAccessor"
   ],
   "client": [
-    "client.EntityRenderDispatcherMixin"
+    "client.EntityRenderDispatcherMixin",
+    "client.IllagerModelMixin",
+    "client.ItemInHandLayerMixin_EvokerRenderer",
+    "client.ItemInHandLayerMixin_IllusionerRenderer",
+    "client.ItemInHandLayerMixin_VindicatorRenderer"
   ],
   "server": [
   ],

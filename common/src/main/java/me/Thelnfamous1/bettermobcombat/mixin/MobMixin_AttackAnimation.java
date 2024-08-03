@@ -12,6 +12,7 @@ import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
 import me.Thelnfamous1.bettermobcombat.BetterMobCombatClient;
+import me.Thelnfamous1.bettermobcombat.api.MobAttackAnimation;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
 import net.bettercombat.BetterCombat;
@@ -41,7 +42,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Mixin(value = Mob.class)
-public abstract class MobMixin_AttackAnimation extends LivingEntity implements PlayerAttackAnimatable, IAnimatedPlayer {
+public abstract class MobMixin_AttackAnimation extends LivingEntity implements PlayerAttackAnimatable, IAnimatedPlayer, MobAttackAnimation {
     @Shadow public abstract boolean isLeftHanded();
 
     @Unique
@@ -154,7 +155,7 @@ public abstract class MobMixin_AttackAnimation extends LivingEntity implements P
             return;
         }
         boolean isLeftHanded = this.isLeftHanded();
-        boolean hasActiveAttackAnimation = this.bettermobcombat$attackAnimation.base.getAnimation() != null && this.bettermobcombat$attackAnimation.base.getAnimation().isActive();
+        boolean hasActiveAttackAnimation = this.bettermobcombat$hasActiveAttackAnimation();
         ItemStack mainHandStack = this.getMainHandItem();
         if (!this.swinging && !this.isSwimming() && !this.isUsingItem() && !Services.PLATFORM.isCastingSpell(this) && !CrossbowItem.isCharged(mainHandStack)) {
             if (hasActiveAttackAnimation) {
@@ -192,6 +193,11 @@ public abstract class MobMixin_AttackAnimation extends LivingEntity implements P
             this.bettermobcombat$offHandBodyPose.setPose(null, isLeftHanded);
             this.bettermobcombat$offHandItemPose.setPose(null, isLeftHanded);
         }
+    }
+
+    @Override
+    public boolean bettermobcombat$hasActiveAttackAnimation() {
+        return this.bettermobcombat$attackAnimation.base.getAnimation() != null && this.bettermobcombat$attackAnimation.base.getAnimation().isActive();
     }
 
     @Unique
