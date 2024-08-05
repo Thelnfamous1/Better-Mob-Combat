@@ -115,6 +115,9 @@ dependencies {
     implementation fg.deobf("maven.modrinth:guard-villagers:${project.guard_villagers_version}")
     implementation fg.deobf("software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}")
     implementation fg.deobf("maven.modrinth:villager-recruits:${recruits_version}")
+    runtimeOnly fg.deobf("maven.modrinth:minecraft-comes-alive-reborn:${mcar_version}")
+    runtimeOnly fg.deobf("maven.modrinth:architectury-api:${architectury_version}")
+    implementation fg.deobf("maven.modrinth:easy-npc:${easy_npc_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {

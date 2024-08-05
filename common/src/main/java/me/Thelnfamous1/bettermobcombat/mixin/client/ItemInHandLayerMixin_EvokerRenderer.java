@@ -7,15 +7,14 @@ import net.minecraft.client.model.IllagerModel;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
-import net.minecraft.world.entity.monster.Evoker;
 import net.minecraft.world.entity.monster.SpellcasterIllager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(targets = "net/minecraft/client/renderer/entity/EvokerRenderer$1")
-public abstract class ItemInHandLayerMixin_EvokerRenderer extends ItemInHandLayer<Evoker, IllagerModel<Evoker>> {
+public abstract class ItemInHandLayerMixin_EvokerRenderer extends ItemInHandLayer<SpellcasterIllager, IllagerModel<SpellcasterIllager>> {
 
-    public ItemInHandLayerMixin_EvokerRenderer(RenderLayerParent<Evoker, IllagerModel<Evoker>> $$0, ItemInHandRenderer $$1) {
+    public ItemInHandLayerMixin_EvokerRenderer(RenderLayerParent<SpellcasterIllager, IllagerModel<SpellcasterIllager>> $$0, ItemInHandRenderer $$1) {
         super($$0, $$1);
     }
 

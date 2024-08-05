@@ -45,6 +45,7 @@ dependencies {
 
     compileOnly "software.bernie.geckolib:geckolib-forge-${minecraft_version}:${geckolib_version}"
     compileOnly("com.eliotlash.mclib:mclib:20")
+    implementation "maven.modrinth:minecraft-comes-alive-reborn:${mcar_version}"
 }
 
 publishing {

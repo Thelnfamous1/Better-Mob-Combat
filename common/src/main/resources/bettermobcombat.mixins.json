@@ -13,7 +13,8 @@
     "MobMixin_AttackAnimation",
     "MobMixin_AttackLogic",
     "RangedWeaponItemMixin",
-    "ServerNetworkAccessor"
+    "ServerNetworkAccessor",
+    "compat.minecraft_comes_alive_reborn.ExtendedMeleeAttackTaskMixin"
   ],
   "client": [
     "client.EntityRenderDispatcherMixin",
