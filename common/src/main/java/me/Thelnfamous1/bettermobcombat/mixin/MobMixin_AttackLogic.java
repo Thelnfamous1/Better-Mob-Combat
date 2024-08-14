@@ -31,7 +31,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -58,10 +57,6 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     private ItemStack bettermobcombat$lastItemInMainHand = ItemStack.EMPTY;
     @Unique
     private int bettermobcombat$attackCooldown;
-
-    @Shadow
-    @Nullable
-    public abstract LivingEntity getTarget();
 
     @Unique
     private ItemStack bettermobcombat$upswingStack;
@@ -144,8 +139,8 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             WeaponAttributes.Attack attack = hand.attack();
             double upswingRate = hand.upswingRate();
             if (!(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - upswingRate)) {
-                Entity intendedTarget = this.getTarget();
-                List<Entity> targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), this.getTarget(), attack, hand.attributes().attackRange());
+                Entity intendedTarget = MobTargetFinder.getAttackTarget((Mob)(Object)this);
+                List<Entity> targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), intendedTarget, attack, hand.attributes().attackRange());
                 if (intendedTarget == null && targets.isEmpty()) {
                     Constants.LOG.debug("Mob {} executed an attack with no AI attack target and no targets in range", this);
                     // PlatformClient.onEmptyLeftClick(((Mob)(Object)this));

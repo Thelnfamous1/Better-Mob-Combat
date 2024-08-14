@@ -13,6 +13,8 @@ import net.bettercombat.logic.TargetHelper.Relation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.ClipContext.Block;
 import net.minecraft.world.level.ClipContext.Fluid;
@@ -24,11 +26,24 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public class MobTargetFinder {
     public MobTargetFinder() {
+    }
+
+    @Nullable
+    public static LivingEntity getAttackTarget(Mob mob){
+        LivingEntity target = mob.getTarget();
+        if(target != null) return target;
+
+        Optional<LivingEntity> attackTarget = mob.getBrain().getMemoryInternal(MemoryModuleType.ATTACK_TARGET);
+        if(attackTarget != null && attackTarget.isPresent()){
+            return attackTarget.get();
+        }
+        return null;
     }
 
     public static TargetFinder.TargetResult findAttackTargetResult(LivingEntity mob, @Nullable Entity intendedTarget, WeaponAttributes.Attack attack, double attackRange) {
@@ -88,7 +103,7 @@ public class MobTargetFinder {
                         && (!entity.equals(mob.getVehicle()) || TargetHelper.isAttackableMount(entity))
                         && MobTargetHelper.getRelation(mob, entity) == Relation.HOSTILE)
                 .collect(Collectors.toList());
-        if (intendedTarget != null && intendedTarget.isAttackable() && detectedEntities.contains(intendedTarget)) {
+        if (intendedTarget != null && detectedEntities.contains(intendedTarget)) {
             targetableEntities.add(intendedTarget);
         }
 
