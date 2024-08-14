@@ -36,16 +36,16 @@ public abstract class MeleeAttackGoalMixin extends Goal {
     }
 
     @WrapWithCondition(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/goal/MeleeAttackGoal;checkAndPerformAttack(Lnet/minecraft/world/entity/LivingEntity;D)V"))
-    private boolean pre_checkAndPerformAttack(MeleeAttackGoal goal, LivingEntity attacker, double distance){
-        return !this.bettermobcombat$useBetterCombatAttackCheck();
+    private boolean pre_checkAndPerformAttack(MeleeAttackGoal goal, LivingEntity target, double distance){
+        return !this.bettermobcombat$useBetterCombatAttackCheck(target);
     }
 
     @Unique
-    protected boolean bettermobcombat$useBetterCombatAttackCheck() {
+    protected boolean bettermobcombat$useBetterCombatAttackCheck(LivingEntity target) {
         return MobCombatHelper.canUseBetterCombatWeapon(this.mob, (m, wa) -> {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat) m).getCurrentAttack();
             if (currentAttack != null) {
-                if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, m.getTarget(), currentAttack.attack(), wa.attackRange())) {
+                if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, target, currentAttack.attack(), wa.attackRange())) {
                     ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
                     this.bettermobcombat$setTicksUntilNextAttack(((MobAttackWindup) m).bettermobcombat$getAttackCooldown());
                     this.bettermobcombat$postBetterCombatAttack();
@@ -66,8 +66,8 @@ public abstract class MeleeAttackGoalMixin extends Goal {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void pre_checkAndPerformAttack(LivingEntity $$0, double $$1, CallbackInfo ci) {
-        if(this.bettermobcombat$useBetterCombatAttackCheck()){
+    private void pre_checkAndPerformAttack(LivingEntity target, double $$1, CallbackInfo ci) {
+        if(this.bettermobcombat$useBetterCombatAttackCheck(target)){
             ci.cancel();
         }
     }

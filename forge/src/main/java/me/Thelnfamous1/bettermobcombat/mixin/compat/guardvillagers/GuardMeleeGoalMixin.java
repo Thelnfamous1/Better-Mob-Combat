@@ -32,8 +32,8 @@ public abstract class GuardMeleeGoalMixin extends MeleeAttackGoalMixin {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void pre_checkAndPerformAttack(LivingEntity $$0, double $$1, CallbackInfo ci) {
-        if(this.bettermobcombat$useBetterCombatAttackCheck()){
+    private void pre_checkAndPerformAttack(LivingEntity target, double $$1, CallbackInfo ci) {
+        if(this.bettermobcombat$useBetterCombatAttackCheck(target)){
             ci.cancel();
         }
     }

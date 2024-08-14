@@ -24,15 +24,15 @@ public abstract class AttackUtilMixin {
         MobCombatHelper.onHoldingBetterCombatWeapon(recruit, (m, wa) -> {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat)m).getCurrentAttack();
             if(currentAttack != null){
-                bettermobcombat$performBetterCombatAttack(recruit, wa, currentAttack);
+                bettermobcombat$performBetterCombatAttack(recruit, target, wa, currentAttack);
                 ci.cancel();
             }
         });
     }
 
     @Unique
-    private static void bettermobcombat$performBetterCombatAttack(AbstractRecruitEntity recruit, WeaponAttributes wa, AttackHand currentAttack) {
-        if (MobCombatHelper.isAttackReady(recruit) && MobCombatHelper.isWithinAttackRange(recruit, recruit.getTarget(), currentAttack.attack(), wa.attackRange())) {
+    private static void bettermobcombat$performBetterCombatAttack(AbstractRecruitEntity recruit, LivingEntity target, WeaponAttributes wa, AttackHand currentAttack) {
+        if (MobCombatHelper.isAttackReady(recruit) && MobCombatHelper.isWithinAttackRange(recruit, target, currentAttack.attack(), wa.attackRange())) {
             ((MobAttackWindup) recruit).bettermobcombat$startUpswing(wa);
             recruit.attackCooldown = ((MobAttackWindup) recruit).bettermobcombat$getAttackCooldown();
         }
@@ -40,15 +40,15 @@ public abstract class AttackUtilMixin {
 
     @Inject(method = "performAttack", remap = false, at = @At("HEAD"), cancellable = true)
     private static void pre_performAttack(AbstractRecruitEntity recruit, LivingEntity target, CallbackInfo ci){
-        if(bettermobcombat$useBetterCombatAttackCheck(recruit)) ci.cancel();
+        if(bettermobcombat$useBetterCombatAttackCheck(recruit, target)) ci.cancel();
     }
 
     @Unique
-    private static boolean bettermobcombat$useBetterCombatAttackCheck(AbstractRecruitEntity recruit) {
+    private static boolean bettermobcombat$useBetterCombatAttackCheck(AbstractRecruitEntity recruit, LivingEntity target) {
         return MobCombatHelper.canUseBetterCombatWeapon(recruit, (m, wa) -> {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat) m).getCurrentAttack();
             if (currentAttack != null) {
-                bettermobcombat$performBetterCombatAttack(recruit, wa, currentAttack);
+                bettermobcombat$performBetterCombatAttack(recruit, target, wa, currentAttack);
                 return true; // cancel as long as there is a current BC attack that the mob can perform
             }
             return false;

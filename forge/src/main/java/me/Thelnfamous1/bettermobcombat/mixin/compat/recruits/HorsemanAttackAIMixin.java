@@ -29,17 +29,17 @@ public abstract class HorsemanAttackAIMixin extends Goal {
             cancellable = true
     )
     private void pre_checkAndPerformAttack(LivingEntity target, CallbackInfo ci) {
-        if(this.bettermobcombat$useBetterCombatAttackCheck()){
+        if(this.bettermobcombat$useBetterCombatAttackCheck(target)){
             ci.cancel();
         }
     }
 
     @Unique
-    protected boolean bettermobcombat$useBetterCombatAttackCheck() {
+    protected boolean bettermobcombat$useBetterCombatAttackCheck(LivingEntity target) {
         return MobCombatHelper.canUseBetterCombatWeapon(this.horseman, (m, wa) -> {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat) m).getCurrentAttack();
             if (currentAttack != null) {
-                if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, m.getTarget(), currentAttack.attack(), wa.attackRange())) {
+                if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, target, currentAttack.attack(), wa.attackRange())) {
                     ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
                     this.bettermobcombat$setTicksUntilNextAttack(((MobAttackWindup) m).bettermobcombat$getAttackCooldown());
                     this.bettermobcombat$postBetterCombatAttack();

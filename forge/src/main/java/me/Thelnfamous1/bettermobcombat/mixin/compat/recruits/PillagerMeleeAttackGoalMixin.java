@@ -38,15 +38,15 @@ public abstract class PillagerMeleeAttackGoalMixin extends Goal {
     @WrapWithCondition(method = "tick", remap = true, at = @At(value = "INVOKE",
             target = "Lcom/talhanation/recruits/entities/ai/pillager/PillagerMeleeAttackGoal;checkAndPerformAttack(Lnet/minecraft/world/entity/LivingEntity;D)V", remap = false))
     private boolean pre_checkAndPerformAttack(PillagerMeleeAttackGoal instance, LivingEntity target, double distance){
-        return !this.bettermobcombat$useBetterCombatAttackCheck();
+        return !this.bettermobcombat$useBetterCombatAttackCheck(target);
     }
 
     @Unique
-    protected boolean bettermobcombat$useBetterCombatAttackCheck() {
+    protected boolean bettermobcombat$useBetterCombatAttackCheck(LivingEntity target) {
         return MobCombatHelper.canUseBetterCombatWeapon(this.mob, (m, wa) -> {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat) m).getCurrentAttack();
             if (currentAttack != null) {
-                if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, m.getTarget(), currentAttack.attack(), wa.attackRange())) {
+                if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, target, currentAttack.attack(), wa.attackRange())) {
                     ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
                     this.bettermobcombat$setTicksUntilNextAttack(((MobAttackWindup) m).bettermobcombat$getAttackCooldown());
                     this.bettermobcombat$postBetterCombatAttack();
@@ -68,8 +68,8 @@ public abstract class PillagerMeleeAttackGoalMixin extends Goal {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void pre_checkAndPerformAttack(LivingEntity $$0, double $$1, CallbackInfo ci) {
-        if(this.bettermobcombat$useBetterCombatAttackCheck()){
+    private void pre_checkAndPerformAttack(LivingEntity target, double $$1, CallbackInfo ci) {
+        if(this.bettermobcombat$useBetterCombatAttackCheck(target)){
             ci.cancel();
         }
     }
