@@ -107,13 +107,12 @@ public class BMCServerConfigHelper {
 
     public boolean isBlacklistedForBetterCombat(Entity entity){
         if(serverConfig.geckolib_mobs_blacklisted && BMCCompatibilityFlags.isGeckolibLoaded()){
-            return GeckolibHelper.isGeoAnimatable(entity);
-        } else{
-            if(serverConfig.mob_blacklist_as_whitelist){
-                return !this.mobBlacklist.contains(entity.getType());
-            } else {
-                return this.mobBlacklist.contains(entity.getType());
-            }
+            if(GeckolibHelper.isGeoAnimatable(entity)) return true;
+        }
+        if(serverConfig.mob_blacklist_as_whitelist){
+            return !this.mobBlacklist.contains(entity.getType());
+        } else {
+            return this.mobBlacklist.contains(entity.getType());
         }
     }
 
