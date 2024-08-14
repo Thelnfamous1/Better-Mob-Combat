@@ -118,6 +118,7 @@ dependencies {
     runtimeOnly fg.deobf("maven.modrinth:minecraft-comes-alive-reborn:${mcar_version}")
     runtimeOnly fg.deobf("maven.modrinth:architectury-api:${architectury_version}")
     implementation fg.deobf("maven.modrinth:easy-npc:${easy_npc_version}")
+    implementation fg.deobf("maven.modrinth:customnpcs-unofficial:${custom_npcs_version}")
 }
 
 tasks.withType(JavaCompile).configureEach {
