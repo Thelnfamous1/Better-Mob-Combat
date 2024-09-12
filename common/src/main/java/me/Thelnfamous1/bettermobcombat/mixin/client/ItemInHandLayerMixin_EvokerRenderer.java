@@ -21,7 +21,7 @@ public abstract class ItemInHandLayerMixin_EvokerRenderer extends ItemInHandLaye
     @WrapOperation(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/monster/SpellcasterIllager;FFFFFF)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/SpellcasterIllager;isCastingSpell()Z"))
     private boolean wrap_isCastingSpellForRenderingItemInHand(SpellcasterIllager instance, Operation<Boolean> original){
-        if(((MobAttackAnimation)instance).bettermobcombat$hasActiveAttackAnimation()){
+        if(((MobAttackAnimation)instance).bettermobcombat$isCombatAnimationActive()){
             return true;
         }
         return original.call(instance);

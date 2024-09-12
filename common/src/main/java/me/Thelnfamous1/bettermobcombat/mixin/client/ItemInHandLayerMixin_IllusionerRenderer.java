@@ -21,7 +21,7 @@ public abstract class ItemInHandLayerMixin_IllusionerRenderer extends ItemInHand
     @WrapOperation(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/monster/Illusioner;FFFFFF)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Illusioner;isCastingSpell()Z"))
     private boolean wrap_isCastingSpellForRenderingItemInHand(Illusioner instance, Operation<Boolean> original){
-        if(((MobAttackAnimation)instance).bettermobcombat$hasActiveAttackAnimation()){
+        if(((MobAttackAnimation)instance).bettermobcombat$isCombatAnimationActive()){
             return true;
         }
         return original.call(instance);
@@ -30,7 +30,7 @@ public abstract class ItemInHandLayerMixin_IllusionerRenderer extends ItemInHand
     @WrapOperation(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/world/entity/monster/Illusioner;FFFFFF)V",
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/Illusioner;isAggressive()Z"))
     private boolean wrap_isAggressiveForRenderingItemInHand(Illusioner instance, Operation<Boolean> original){
-        if(((MobAttackAnimation)instance).bettermobcombat$hasActiveAttackAnimation()){
+        if(((MobAttackAnimation)instance).bettermobcombat$isCombatAnimationActive()){
             return true;
         }
         return original.call(instance);

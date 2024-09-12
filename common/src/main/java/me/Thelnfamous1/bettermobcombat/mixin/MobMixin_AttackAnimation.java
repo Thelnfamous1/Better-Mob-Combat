@@ -200,6 +200,26 @@ public abstract class MobMixin_AttackAnimation extends LivingEntity implements P
         return this.bettermobcombat$attackAnimation.base.getAnimation() != null && this.bettermobcombat$attackAnimation.base.getAnimation().isActive();
     }
 
+    @Override
+    public boolean bettermobcombat$hasActiveMainHandItemPose() {
+        return this.bettermobcombat$mainHandItemPose.base.getAnimation() != null && this.bettermobcombat$mainHandItemPose.base.getAnimation().isActive();
+    }
+
+    @Override
+    public boolean bettermobcombat$hasActiveOffHandItemPose() {
+        return this.bettermobcombat$offHandItemPose.base.getAnimation() != null && this.bettermobcombat$offHandItemPose.base.getAnimation().isActive();
+    }
+
+    @Override
+    public boolean bettermobcombat$hasActiveMainHandBodyPose() {
+        return this.bettermobcombat$mainHandBodyPose.base.getAnimation() != null && this.bettermobcombat$mainHandBodyPose.base.getAnimation().isActive();
+    }
+
+    @Override
+    public boolean bettermobcombat$hasActiveOffHandBodyPose() {
+        return this.bettermobcombat$offHandBodyPose.base.getAnimation() != null && this.bettermobcombat$offHandBodyPose.base.getAnimation().isActive();
+    }
+
     @Unique
     private boolean bettermobcombat$isWalking() {
         return !this.isDeadOrDying() && (this.isSwimming() || this.getDeltaMovement().horizontalDistance() > 0.03);

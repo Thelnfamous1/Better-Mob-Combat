@@ -119,6 +119,7 @@ dependencies {
     runtimeOnly fg.deobf("maven.modrinth:architectury-api:${architectury_version}")
     implementation fg.deobf("maven.modrinth:easy-npc:${easy_npc_version}")
     implementation fg.deobf("maven.modrinth:customnpcs-unofficial:${custom_npcs_version}")
+    runtimeOnly(fg.deobf("maven.modrinth:simply-swords:${simply_swords_version}-forge"))
 }
 
 tasks.withType(JavaCompile).configureEach {

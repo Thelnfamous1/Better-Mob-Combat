@@ -13,7 +13,7 @@ public abstract class IllagerModelMixin<T extends AbstractIllager> extends Hiera
 
     @ModifyVariable(method = "setupAnim(Lnet/minecraft/world/entity/monster/AbstractIllager;FFFFF)V", at = @At(value = "STORE", ordinal = 0), ordinal = 0)
     private boolean modifyUseCrossedArms(boolean useCrossedArms, T illager, float $$1, float $$2, float $$3, float $$4, float $$5){
-        if(((MobAttackAnimation)illager).bettermobcombat$hasActiveAttackAnimation()){
+        if(((MobAttackAnimation)illager).bettermobcombat$isCombatAnimationActive()){
             return false;
         }
         return useCrossedArms;
