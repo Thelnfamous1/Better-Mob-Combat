@@ -38,6 +38,9 @@ public class MobAttackHelper {
     }
 
     public static boolean isTwoHandedWielding(LivingEntity mob) {
+        if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(mob)){
+            return false;
+        }
         WeaponAttributes mainAttributes = WeaponRegistry.getAttributes(mob.getMainHandItem());
         return mainAttributes != null && mainAttributes.isTwoHanded();
     }

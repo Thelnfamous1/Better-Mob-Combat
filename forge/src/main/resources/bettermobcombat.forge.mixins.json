@@ -11,6 +11,7 @@
     "compat.recruits.AttackUtilMixin",
     "compat.recruits.HorsemanAttackAIMixin",
     "compat.recruits.PillagerMeleeAttackGoalMixin",
+    "compat.recruits.RecruitEatGoalMixin",
     "compat.recruits.RecruitMeleeAttackGoalMixin",
     "compat.recruits.UseShieldMixin"
   ],
