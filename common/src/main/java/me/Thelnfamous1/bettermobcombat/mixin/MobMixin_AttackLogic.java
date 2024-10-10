@@ -222,13 +222,12 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     }
 
     @Inject(
-            method = {"aiStep"},
+            method = {"serverAiStep"},
             at = {@At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/LivingEntity;aiStep()V"
+                    "TAIL"
             )}
     )
-    private void pre_aiStep_aiStep(CallbackInfo ci) {
+    private void post_serverAiStep(CallbackInfo ci) {
         if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
             return;
         }
