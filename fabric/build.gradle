@@ -5,7 +5,7 @@ plugins {
     id 'fabric-loom'
 }
 base {
-    archivesName = "${mod_name}-fabric-${minecraft_version}"
+    archivesName = "${mod_id}-fabric-${minecraft_version}"
 }
 
 repositories {
@@ -13,6 +13,17 @@ repositories {
     maven { url 'https://maven.shedaniel.me' }
     maven { url "https://maven.terraformersmc.com/releases/" }
     maven { url = "https://api.modrinth.com/maven" }
+    flatDir {
+        dirs 'lib'
+    }
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroupByRegex("software\\.bernie.*")
+            includeGroup("com.eliotlash.mclib")
+        }
+    }
 }
 
 dependencies {
@@ -30,10 +41,12 @@ dependencies {
         exclude(group: "net.fabricmc.fabric-api")
     }
     modImplementation("dev.kosmx.player-anim:player-animation-lib-fabric:${project.player_anim_version}")
+    modRuntimeOnly("lib:mobplayeranimator-fabric:${project.mob_player_anim_version}")
 
     // Mod Compat
+    modImplementation "software.bernie.geckolib:geckolib-fabric-${minecraft_version}:${geckolib_version}"
     modRuntimeOnly("maven.modrinth:minecraft-comes-alive-reborn:${project.mcar_version}")
-    modRuntimeOnly("maven.modrinth:architectury-api:${architectury_version}")
+    modRuntimeOnly("maven.modrinth:architectury-api:${architectury_version}+fabric")
 }
 
 loom {

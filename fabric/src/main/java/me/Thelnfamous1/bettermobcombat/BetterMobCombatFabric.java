@@ -1,9 +1,14 @@
 package me.Thelnfamous1.bettermobcombat;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.server.MinecraftServer;
+import org.jetbrains.annotations.Nullable;
 
 public class BetterMobCombatFabric implements ModInitializer {
-    
+
+    private static MinecraftServer currentServer;
+
     @Override
     public void onInitialize() {
         
@@ -13,5 +18,12 @@ public class BetterMobCombatFabric implements ModInitializer {
 
         // Use Fabric to bootstrap the Common mod.
         BetterMobCombat.init();
+        ServerLifecycleEvents.SERVER_STARTING.register(server -> currentServer = server);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> currentServer = null);
+    }
+
+    @Nullable
+    public static MinecraftServer getServer(){
+        return currentServer;
     }
 }

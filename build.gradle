@@ -73,9 +73,13 @@ subprojects {
                 "license": license,
                 "description": project.description,
                 "credits": credits,
+                "mob_player_anim_version_min": mob_player_anim_version_min,
                 "mob_player_anim_version_range": mob_player_anim_version_range,
+                "better_combat_version_min": better_combat_version_min,
                 "better_combat_version_range": better_combat_version_range,
+                "player_anim_version_min": player_anim_version_min,
                 "player_anim_version_range": player_anim_version_range,
+                "cloth_config_version_min": cloth_config_version_min,
                 "cloth_config_version_range": cloth_config_version_range,
                 "guard_villagers_version_range": guard_villagers_version_range,
                 "recruits_version_range": recruits_version_range

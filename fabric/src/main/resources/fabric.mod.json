@@ -9,14 +9,18 @@
     ],
     "contact": {
         "homepage": "https://fabricmc.net/",
-        "sources": "https://github.com/FabricMC/fabric-example-mod"
+        "sources": "https://github.com/Thelnfamous1/Better-Mob-Combat",
+        "issues": "https://github.com/Thelnfamous1/Better-Mob-Combat/issues"
     },
     "license": "${license}",
     "icon": "assets/modid/${mod_id}.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-          "me.example.examplemod.ExampleMod"
+            "me.Thelnfamous1.bettermobcombat.BetterMobCombatFabric"
+        ],
+        "client": [
+            "me.Thelnfamous1.bettermobcombat.BetterMobCombatFabricClient"
         ]
     },
     "mixins": [
@@ -27,7 +31,11 @@
         "fabricloader": ">=0.14",
         "fabric": "*",
         "minecraft": "${minecraft_version}",
-        "java": ">=17"
+        "java": ">=17",
+        "bettercombat": ">=${better_combat_version_min}",
+        "mobplayeranimator": ">=${mob_player_anim_version_min}",
+        "player-animator": ">=${player_anim_version_min}",
+        "cloth-config": ">=${cloth_config_version_min}"
     },
     "suggests": {
         "another-mod": "*"

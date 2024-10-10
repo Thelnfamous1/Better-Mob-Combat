@@ -2,10 +2,7 @@ package me.Thelnfamous1.bettermobcombat.logic;
 
 import me.Thelnfamous1.bettermobcombat.BetterMobCombat;
 import net.bettercombat.logic.TargetHelper;
-import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.monster.Monster;
 
@@ -39,7 +36,7 @@ public class MobTargetHelper {
                     return TargetHelper.Relation.FRIENDLY;
                 } else if(BetterMobCombat.getServerConfig().mobs_check_for_same_entity_type && attacker.getType().equals(target.getType())){
                     return TargetHelper.Relation.FRIENDLY;
-                } else if(BetterMobCombat.getServerConfig().mobs_check_for_same_mob_type
+                } else if(BetterMobCombat.getServerConfig().mobs_check_for_same_mob_type && !attacker.getMobType().equals(MobType.UNDEFINED)
                         && target instanceof LivingEntity livingTarget && attacker.getMobType().equals(livingTarget.getMobType())){
                     return TargetHelper.Relation.FRIENDLY;
                 } else {
