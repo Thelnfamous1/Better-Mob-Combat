@@ -7,6 +7,7 @@ import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.ComboState;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.logic.WeaponRegistry;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
@@ -175,6 +176,15 @@ public class MobAttackHelper {
             mob.getAttributes().addTransientAttributeModifiers(add.getAttributeModifiers(EquipmentSlot.MAINHAND));
         }
 
+    }
+
+    public static double getTotalUpswingRate(AttackHand hand) {
+        double additionalUpswingRate = Mth.clamp(hand.attack().upswing(), 0.0D, 1.0D) * BetterMobCombat.getServerConfig().mob_additional_upswing_multiplier;
+        return Mth.clamp(hand.upswingRate() + additionalUpswingRate, 0.2D, 1.0D);
+    }
+
+    public static double getTotalUpswingMultiplier() {
+        return Mth.clamp(BetterCombat.config.getUpswingMultiplier() + BetterMobCombat.getServerConfig().mob_additional_upswing_multiplier, 0.2D, 1.0D);
     }
 
     private record AttackSelection(WeaponAttributes.Attack attack, ComboState comboState) {

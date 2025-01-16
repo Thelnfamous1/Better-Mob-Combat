@@ -15,7 +15,6 @@ import me.Thelnfamous1.bettermobcombat.BetterMobCombatClient;
 import me.Thelnfamous1.bettermobcombat.api.MobAttackAnimation;
 import me.Thelnfamous1.bettermobcombat.logic.MobAttackHelper;
 import me.Thelnfamous1.bettermobcombat.platform.Services;
-import net.bettercombat.BetterCombat;
 import net.bettercombat.api.WeaponAttributes;
 import net.bettercombat.client.animation.*;
 import net.bettercombat.client.animation.modifier.HarshAdjustmentModifier;
@@ -243,8 +242,9 @@ public abstract class MobMixin_AttackAnimation extends LivingEntity implements P
             }
 
             int fadeIn = copy.beginTick;
-            float upswingSpeed = speed / BetterCombat.config.getUpswingMultiplier();
-            float downwindSpeed = (float) ((double) speed * Mth.lerp(Math.max((double) BetterCombat.config.getUpswingMultiplier() - 0.5, 0.0) / 0.5, 1.0F - upswing, upswing / (1.0F - upswing)));
+            float upswingMultiplier = (float) MobAttackHelper.getTotalUpswingMultiplier();
+            float upswingSpeed = speed / upswingMultiplier;
+            float downwindSpeed = (float) ((double) speed * Mth.lerp(Math.max((double) upswingMultiplier - 0.5, 0.0) / 0.5, 1.0F - upswing, upswing / (1.0F - upswing)));
             this.bettermobcombat$attackAnimation.speed.set(upswingSpeed, List.of(new TransmissionSpeedModifier.Gear(length * upswing, downwindSpeed), new TransmissionSpeedModifier.Gear(length, speed)));
             this.bettermobcombat$attackAnimation.mirror.setEnabled(mirror);
             CustomAnimationPlayer player = new CustomAnimationPlayer(copy.build(), 0);

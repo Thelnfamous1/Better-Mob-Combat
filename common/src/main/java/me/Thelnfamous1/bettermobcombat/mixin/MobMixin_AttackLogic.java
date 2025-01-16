@@ -137,7 +137,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
         AttackHand hand = this.bettermobcombat$getCurrentHand();
         if (hand != null) {
             WeaponAttributes.Attack attack = hand.attack();
-            double upswingRate = hand.upswingRate();
+            double upswingRate = MobAttackHelper.getTotalUpswingRate(hand);
             if (!(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - upswingRate)) {
                 Entity intendedTarget = MobTargetFinder.getAttackTarget((Mob)(Object)this);
                 List<Entity> targets = MobTargetFinder.findAttackTargets(((Mob) (Object) this), intendedTarget, attack, hand.attributes().attackRange());
@@ -395,7 +395,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     public void bettermobcombat$startUpswing(WeaponAttributes attributes) {
         AttackHand hand = this.bettermobcombat$getCurrentHand();
         if (hand != null) {
-            float upswingRate = (float) hand.upswingRate();
+            float upswingRate = (float) MobAttackHelper.getTotalUpswingRate(hand);
             if (this.bettermobcombat$upswingTicks <= 0 && this.bettermobcombat$attackCooldown <= 0 && !this.isUsingItem() && !(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - (double) upswingRate)) {
                 this.releaseUsingItem();
                 this.bettermobcombat$lastAttacked = 0;

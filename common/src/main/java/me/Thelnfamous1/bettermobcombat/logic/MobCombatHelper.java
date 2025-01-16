@@ -231,6 +231,8 @@ public class MobCombatHelper {
         if (!MobAttackRangeExtensions.sources().isEmpty()) {
             attackRange = MobTargetFinder.applyAttackRangeModifiers(mob, attackRange);
         }
+        // scale the attack range by the config multiplier, as this method is used for starting attacks, not damage application
+        attackRange *= BetterMobCombat.getServerConfig().mob_begin_attack_range_multiplier;
 
         boolean isSpinAttack = attack.angle() > 180.0;
         Vec3 size = WeaponHitBoxes.createHitbox(attack.hitbox(), attackRange, isSpinAttack);
