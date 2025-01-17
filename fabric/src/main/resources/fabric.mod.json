@@ -33,12 +33,11 @@
         "minecraft": "${minecraft_version}",
         "java": ">=17",
         "bettercombat": ">=${better_combat_version_min}",
-        "mobplayeranimator": ">=${mob_player_anim_version_min}",
         "player-animator": ">=${player_anim_version_min}",
         "cloth-config": ">=${cloth_config_version_min}"
     },
-    "suggests": {
-        "another-mod": "*"
+    "recommends": {
+        "mobplayeranimator": ">=${mob_player_anim_version_min}"
     }
 }
   

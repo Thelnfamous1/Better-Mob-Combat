@@ -35,13 +35,13 @@ modId="mobplayeranimator"
 mandatory=true
 versionRange="${mob_player_anim_version_range}"
 ordering="AFTER"
-side="BOTH"
+side="CLIENT"
 [[dependencies.${mod_id}]]
 modId="playeranimator"
 mandatory=true
 versionRange="${player_anim_version_range}"
 ordering="AFTER"
-side="BOTH"
+side="CLIENT"
 [[dependencies.${mod_id}]]
 modId="cloth_config"
 mandatory=true
