@@ -108,7 +108,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     }
 
     @Unique
-    private void bettermobcombat$cancelWeaponSwing() {
+    public void bettermobcombat$cancelWeaponSwing() {
         if(BetterMobCombat.getServerConfigHelper().isBlacklistedForBetterCombat(this)){
             return;
         }
