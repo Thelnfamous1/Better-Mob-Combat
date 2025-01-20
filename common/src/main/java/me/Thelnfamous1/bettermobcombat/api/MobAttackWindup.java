@@ -17,4 +17,8 @@ public interface MobAttackWindup {
     }
 
     void bettermobcombat$cancelUpswing();
+
+    void bettermobcombat$setDelayedUpswing(Runnable runnable);
+
+    boolean bettermobcombat$hasDelayedUpswing();
 }

@@ -46,9 +46,11 @@ public abstract class MeleeAttackGoalMixin extends Goal {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat) m).getCurrentAttack();
             if (currentAttack != null) {
                 if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, target, currentAttack.attack(), wa.attackRange())) {
-                    ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
-                    this.bettermobcombat$setTicksUntilNextAttack(((MobAttackWindup) m).bettermobcombat$getAttackCooldown());
-                    this.bettermobcombat$postBetterCombatAttack();
+                    MobCombatHelper.setDelayedUpswing(m, () -> {
+                        ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
+                        this.bettermobcombat$setTicksUntilNextAttack(((MobAttackWindup) m).bettermobcombat$getAttackCooldown());
+                        this.bettermobcombat$postBetterCombatAttack();
+                    });
                 }
                 return true; // return true as long as there is a current BC attack that the mob can perform
             }

@@ -21,10 +21,15 @@ public class BMCServerConfig implements ConfigData {
             max = 100L
     )
     public int mob_additional_attack_cooldown = 7;
+    @Comment("The amount of ticks before a mob will launch a Better Combat attack when they are ready to do so.")
+    @ConfigEntry.BoundedDiscrete(
+            max = 100L
+    )
+    public int mob_begin_attack_delay = 10;
     @Comment("The amount to add to the \"upswing_multiplier\" config value when calculating a mob's Better Combat attack upswing.  \nA value of 0.0 means the upswing will be at normal speed. \nA value of 0.5 means the upswing will be 50% longer. \nNOTE: The total upswing multiplier will be clamped between 0.2 and 1.0.")
-    public float mob_additional_upswing_multiplier = 0.5F;
+    public float mob_additional_upswing_multiplier = 0.0F;
     @Comment("The amount to scale a mob's attack range by when determining when they should launch a Better Combat attack. \nA value of 0.5 means attack swings are triggered when the target is up to 50% of the attack range away from the mob. \nA value of 1 means attack swings are triggered when the target is up to the full attack range away from the mob. \nNOTE: This does not affect the range of the mob's attack during the point of damage application.")
-    public float mob_begin_attack_range_multiplier = 0.5F;
+    public float mob_begin_attack_range_multiplier = 1.0F;
     @Comment("Controls which mobs are blacklisted from using the Better Combat system. \nHelpful if certain mobs aren't able to properly animate Better Combat attacks.")
     public String[] mob_blacklist = new String[]{"minecraft:fox"};
 

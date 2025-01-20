@@ -42,9 +42,11 @@ public abstract class ExtendedMeleeAttackTaskMixin {
             if (currentAttack != null) {
                 LivingEntity target = this.getTarget(mobEntity);
                 if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, target, currentAttack.attack(), wa.attackRange())) {
-                    BehaviorUtils.lookAtEntity(mobEntity, target);
-                    ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
-                    mobEntity.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_COOLING_DOWN, true, ((MobAttackWindup) m).bettermobcombat$getAttackCooldown());
+                    MobCombatHelper.setDelayedUpswing(m, () -> {
+                        BehaviorUtils.lookAtEntity(mobEntity, target);
+                        ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
+                        mobEntity.getBrain().setMemoryWithExpiry(MemoryModuleType.ATTACK_COOLING_DOWN, true, ((MobAttackWindup) m).bettermobcombat$getAttackCooldown());
+                    });
                 }
                 ci.cancel();
             }

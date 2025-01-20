@@ -36,9 +36,11 @@ public abstract class MeleeAttackMixin {
                         && MobCombatHelper.isAttackReady(m)
                         && m.isWithinMeleeAttackRange(target)
                         && ((NearestVisibleLivingEntities)instance.get(nvle)).contains(target)){
-                    ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
-                    lookTarget.set(new EntityTracker(target, true));
-                    attackCoolingDown.setWithExpiry(true, ((MobAttackWindup)m).bettermobcombat$getAttackCooldown());
+                    MobCombatHelper.setDelayedUpswing(m, () -> {
+                        ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
+                        lookTarget.set(new EntityTracker(target, true));
+                        attackCoolingDown.setWithExpiry(true, ((MobAttackWindup)m).bettermobcombat$getAttackCooldown());
+                    });
                     cir.setReturnValue(true);
                 } else{
                     cir.setReturnValue(false);

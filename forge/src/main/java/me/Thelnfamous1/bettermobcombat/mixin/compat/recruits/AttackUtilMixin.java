@@ -33,8 +33,10 @@ public abstract class AttackUtilMixin {
     @Unique
     private static void bettermobcombat$performBetterCombatAttack(AbstractRecruitEntity recruit, LivingEntity target, WeaponAttributes wa, AttackHand currentAttack) {
         if (MobCombatHelper.isAttackReady(recruit) && MobCombatHelper.isWithinAttackRange(recruit, target, currentAttack.attack(), wa.attackRange())) {
-            ((MobAttackWindup) recruit).bettermobcombat$startUpswing(wa);
-            recruit.attackCooldown = ((MobAttackWindup) recruit).bettermobcombat$getAttackCooldown();
+            MobCombatHelper.setDelayedUpswing(recruit, () -> {
+                ((MobAttackWindup) recruit).bettermobcombat$startUpswing(wa);
+                recruit.attackCooldown = ((MobAttackWindup) recruit).bettermobcombat$getAttackCooldown();
+            });
         }
     }
 

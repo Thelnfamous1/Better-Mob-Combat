@@ -248,6 +248,10 @@ public class MobCombatHelper {
     }
 
     public static boolean isAttackReady(Mob mob) {
-        return ((MobAttackWindup) mob).bettermobcombat$getAttackCooldown() <= 0;
+        return !((MobAttackWindup) mob).bettermobcombat$hasDelayedUpswing() && ((MobAttackWindup) mob).bettermobcombat$getAttackCooldown() <= 0;
+    }
+
+    public static void setDelayedUpswing(Mob mob, Runnable runnable){
+        ((MobAttackWindup)mob).bettermobcombat$setDelayedUpswing(runnable);
     }
 }

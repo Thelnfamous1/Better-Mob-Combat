@@ -70,6 +70,11 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     private float bettermobcombat$lastSwingDuration = 0.0F;
     @Unique
     private int bettermobcombat$comboReset = 0;
+    @Unique
+    private int bettermobcombat$upswingDelay;
+    @Unique
+    @Nullable
+    private Runnable bettermobcombat$delayedUpswing;
 
     protected MobMixin_AttackLogic(EntityType<? extends LivingEntity> $$0, Level $$1) {
         super($$0, $$1);
@@ -81,6 +86,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     )
     private void pre_tick(CallbackInfo ci) {
         if (!this.level().isClientSide) {
+            this.bettermobcombat$startUpswingIfDelayed();
             if (this.bettermobcombat$attackCooldown > 0) {
                 --this.bettermobcombat$attackCooldown;
             }
@@ -88,6 +94,19 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
             this.bettermobcombat$cancelSwingIfNeeded();
             this.bettermobcombat$attackFromUpswingIfNeeded();
             this.bettermobcombat$resetComboIfNeeded();
+        }
+    }
+
+    @Unique
+    private void bettermobcombat$startUpswingIfDelayed() {
+        if (this.bettermobcombat$upswingDelay > 0) {
+            --this.bettermobcombat$upswingDelay;
+            if(this.bettermobcombat$upswingDelay <= 0 && this.bettermobcombat$delayedUpswing != null){
+                if(!this.isDeadOrDying()){
+                    this.bettermobcombat$delayedUpswing.run();
+                }
+                this.bettermobcombat$delayedUpswing = null;
+            }
         }
     }
 
@@ -486,6 +505,21 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
         if (this.bettermobcombat$upswingTicks > 0) {
             this.bettermobcombat$cancelWeaponSwing();
         }
+    }
+
+    @Override
+    public void bettermobcombat$setDelayedUpswing(Runnable runnable) {
+        if(BetterMobCombat.getServerConfig().mob_begin_attack_delay > 0){
+            this.bettermobcombat$delayedUpswing = runnable;
+            this.bettermobcombat$upswingDelay = BetterMobCombat.getServerConfig().mob_begin_attack_delay;
+        } else{
+            runnable.run();
+        }
+    }
+
+    @Override
+    public boolean bettermobcombat$hasDelayedUpswing() {
+        return this.bettermobcombat$delayedUpswing != null;
     }
 
     // PlayerAttackProperties
