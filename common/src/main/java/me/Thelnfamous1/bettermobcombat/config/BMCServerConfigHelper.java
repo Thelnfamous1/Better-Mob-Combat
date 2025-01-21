@@ -19,8 +19,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class BMCServerConfigHelper {
+    public static final Codec<EntityType<?>> ENTITY_TYPE_CODEC = ResourceLocation.CODEC.comapFlatMap(rl -> {
+        if (BuiltInRegistries.ENTITY_TYPE.containsKey(rl)) {
+            return DataResult.success(BuiltInRegistries.ENTITY_TYPE.get(rl));
+        }
+        return DataResult.error(() -> String.format("Could not parse %s, not a valid entity type", rl));
+    }, BuiltInRegistries.ENTITY_TYPE::getKey);
     public static final Codec<TargetHelper.Relation> RELATION_CODEC = Codec.STRING.comapFlatMap(BMCServerConfigHelper::readRelation, Enum::name).stable();
-    public static final Codec<Map<EntityType<?>, TargetHelper.Relation>> MOB_RELATIONS_CODEC = Codec.unboundedMap(BuiltInRegistries.ENTITY_TYPE.byNameCodec(), RELATION_CODEC);
+    public static final Codec<Map<EntityType<?>, TargetHelper.Relation>> MOB_RELATIONS_CODEC = Codec.unboundedMap(ENTITY_TYPE_CODEC, RELATION_CODEC);
     public static final Codec<Map<String, TargetHelper.Relation>> MOB_RELATIONS_STRING_CODEC = Codec.unboundedMap(Codec.STRING, RELATION_CODEC);
     private final BMCServerConfig serverConfig;
     private final Set<EntityType<?>> mobBlacklist = new HashSet<>();
@@ -49,8 +55,7 @@ public class BMCServerConfigHelper {
         }
         // mob relations
         serverConfig.mob_relations.forEach((key, value) -> {
-            Codec<? extends EntityType<?>> resourceLocationToEntityType = getResourceLocationToEntityTypeCodec();
-            EntityType<?> entityType = resourceLocationToEntityType.parse(JsonOps.INSTANCE, new JsonPrimitive(key)).result().orElse(null);
+            EntityType<?> entityType =  ENTITY_TYPE_CODEC.parse(JsonOps.INSTANCE, new JsonPrimitive(key)).result().orElse(null);
             if(entityType == null) {
                 if(log) Constants.LOG.error("Could not parse {} entry key {}, not a valid namespaced id", "mob_relations", key);
                 return;
@@ -69,15 +74,6 @@ public class BMCServerConfigHelper {
         parseMobRelations(serverConfig.mob_relations_to_hostiles, this.mobRelationsToHostiles, "mob_relations_to_hostiles", log);
         // mob relation to others
         parseMobRelations(serverConfig.mob_relations_to_other, this.mobRelationsToOther, "mob_relations_to_others", log);
-    }
-
-    private static Codec<? extends EntityType<?>> getResourceLocationToEntityTypeCodec() {
-        return ResourceLocation.CODEC.comapFlatMap(rl -> {
-            if (BuiltInRegistries.ENTITY_TYPE.containsKey(rl)) {
-                return DataResult.success(BuiltInRegistries.ENTITY_TYPE.get(rl));
-            }
-            return DataResult.error(() -> String.format("Could not parse %s, not a valid entity type", rl));
-        }, BuiltInRegistries.ENTITY_TYPE::getKey);
     }
 
     private static DataResult<TargetHelper.Relation> readRelation(String relation) {
