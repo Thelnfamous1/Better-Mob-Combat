@@ -120,6 +120,9 @@ dependencies {
     implementation fg.deobf("maven.modrinth:easy-npc:${easy_npc_version}")
     implementation fg.deobf("maven.modrinth:customnpcs-unofficial:${custom_npcs_version}")
     runtimeOnly(fg.deobf("maven.modrinth:simply-swords:${simply_swords_version}-forge"))
+    implementation(fg.deobf("maven.modrinth:irons-spells-n-spellbooks:${irons_spells_n_spellbooks_version}"))
+    runtimeOnly(fg.deobf("maven.modrinth:curios:${curios_version}"))
+    runtimeOnly(fg.deobf("maven.modrinth:caelus:${caelus_api_version}"))
 }
 
 tasks.withType(JavaCompile).configureEach {

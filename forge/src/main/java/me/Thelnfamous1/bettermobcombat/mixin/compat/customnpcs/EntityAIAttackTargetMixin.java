@@ -36,8 +36,6 @@ public class EntityAIAttackTargetMixin {
 
     @Unique
     private static Boolean bettermobcombat$wrappedInMeleeRangeCheck(EntityNPCInterface attacker, Entity target, double range, Operation<Boolean> original) {
-        //TODO: Implement once CustomNPC compat is available via Mob Player Animator
-        /*
         return MobCombatHelper.applyWithBetterCombatWeapon(attacker, (m, wa) -> {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat) m).getCurrentAttack();
             if (currentAttack != null) {
@@ -45,8 +43,6 @@ public class EntityAIAttackTargetMixin {
             }
             return false;
         }, () -> original.call(attacker, target, range));
-         */
-        return original.call(attacker, target, range);
     }
 
     @WrapOperation(method = "canContinueToUse", at = @At(value = "INVOKE", target = "Lnoppes/npcs/entity/EntityNPCInterface;isInRange(Lnet/minecraft/world/entity/Entity;D)Z", remap = false, ordinal = 1))
@@ -56,18 +52,17 @@ public class EntityAIAttackTargetMixin {
 
     @Inject(method = "tick", at = @At(value = "FIELD", target = "Lnoppes/npcs/ai/EntityAIAttackTarget;attackTick:I", remap = false, opcode = Opcodes.PUTFIELD, ordinal = 0, shift = At.Shift.AFTER), cancellable = true)
     private void handleBetterCombatAttack(CallbackInfo ci){
-        //TODO: Implement once CustomNPC compat is available via Mob Player Animator
-        /*
         MobCombatHelper.onHoldingBetterCombatWeapon(this.npc, (m, wa) -> {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat) m).getCurrentAttack();
             if (currentAttack != null) {
                 if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, this.entityTarget, currentAttack.attack(), wa.attackRange())) {
-                    ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
-                    this.attackTick = ((MobAttackWindup) m).bettermobcombat$getAttackCooldown();
+                    MobCombatHelper.setDelayedUpswing(m, () -> {
+                            ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
+                        this.attackTick = ((MobAttackWindup) m).bettermobcombat$getAttackCooldown();
+                    });
                 }
                 ci.cancel();
             }
         });
-         */
     }
 }

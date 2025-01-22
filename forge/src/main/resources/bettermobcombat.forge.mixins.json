@@ -7,6 +7,7 @@
   "mixins": [
     "compat.customnpcs.EntityAIAttackTargetMixin",
     "compat.guardvillagers.GuardMeleeGoalMixin",
+    "compat.ironsspellbooks.WarlockAttackGoalMixin",
     "compat.recruits.AbstractRecruitEntityMixin",
     "compat.recruits.AttackUtilMixin",
     "compat.recruits.HorsemanAttackAIMixin",
