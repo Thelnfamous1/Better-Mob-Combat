@@ -41,6 +41,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 @Mixin(value = Mob.class)
 public abstract class MobMixin_AttackLogic extends LivingEntity implements EntityPlayer_BetterCombat, MobAttackStrength, MobAttackWindup, PlayerAttackProperties {
@@ -75,6 +76,9 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     @Unique
     @Nullable
     private Runnable bettermobcombat$delayedUpswing;
+    @Unique
+    @Nullable
+    private BiConsumer<Mob, Entity> bettermobcombat$customDamageApplicator;
 
     protected MobMixin_AttackLogic(EntityType<? extends LivingEntity> $$0, Level $$1) {
         super($$0, $$1);
@@ -165,7 +169,7 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
                     // PlatformClient.onEmptyLeftClick(((Mob)(Object)this));
                 }
 
-                MobCombatHelper.processAttack(this.level(), ((Mob) (Object) this), this.getComboCount(), targets);
+                MobCombatHelper.processAttack(this.level(), ((Mob) (Object) this), this.getComboCount(), targets, this.bettermobcombat$customDamageApplicator);
 
                 this.bettercombat$resetAttackStrengthTicker();
                 BetterMobCombatEvents.ATTACK_HIT.invoke((handler) -> {
@@ -411,11 +415,12 @@ public abstract class MobMixin_AttackLogic extends LivingEntity implements Entit
     }
 
     @Override
-    public void bettermobcombat$startUpswing(WeaponAttributes attributes) {
+    public void bettermobcombat$startUpswing(WeaponAttributes attributes, @Nullable BiConsumer<Mob, Entity> customDamageApplicator) {
         AttackHand hand = this.bettermobcombat$getCurrentHand();
         if (hand != null) {
             float upswingRate = (float) MobAttackHelper.getTotalUpswingRate(hand);
             if (this.bettermobcombat$upswingTicks <= 0 && this.bettermobcombat$attackCooldown <= 0 && !this.isUsingItem() && !(this.bettercombat$getAttackStrengthScale(0.0F) < 1.0 - (double) upswingRate)) {
+                this.bettermobcombat$customDamageApplicator = customDamageApplicator;
                 this.releaseUsingItem();
                 this.bettermobcombat$lastAttacked = 0;
                 this.bettermobcombat$upswingStack = this.getMainHandItem();

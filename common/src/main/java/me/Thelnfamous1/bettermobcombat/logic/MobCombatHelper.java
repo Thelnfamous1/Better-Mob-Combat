@@ -36,6 +36,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -86,7 +87,7 @@ public class MobCombatHelper {
         return defaultValue.get();
     }
 
-    public static void processAttack(Level world, Mob mob, int comboCount, List<Entity> targets){
+    public static void processAttack(Level world, Mob mob, int comboCount, List<Entity> targets, @Nullable BiConsumer<Mob, Entity> damageApplicator){
         if (world != null && !world.isClientSide) {
             AttackHand hand = MobAttackHelper.getCurrentAttack(mob, comboCount);
             if (hand == null) {
@@ -164,7 +165,11 @@ public class MobCombatHelper {
                                 return;
                             }
 
-                            mob.doHurtTarget(target);
+                            if(damageApplicator != null){
+                                damageApplicator.accept(mob, target);
+                            } else{
+                                mob.doHurtTarget(target);
+                            }
 
                             if (livingTarget != null) {
                                 if (knockbackMultiplier != 1.0F) {

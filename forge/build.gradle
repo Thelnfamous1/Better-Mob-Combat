@@ -93,6 +93,9 @@ repositories {
             includeGroup("com.eliotlash.mclib")
         }
     }
+    maven {
+        url "https://cursemaven.com"
+    }
 }
 
 dependencies {
@@ -121,8 +124,15 @@ dependencies {
     implementation fg.deobf("maven.modrinth:customnpcs-unofficial:${custom_npcs_version}")
     runtimeOnly(fg.deobf("maven.modrinth:simply-swords:${simply_swords_version}-forge"))
     implementation(fg.deobf("maven.modrinth:irons-spells-n-spellbooks:${irons_spells_n_spellbooks_version}"))
-    runtimeOnly(fg.deobf("maven.modrinth:curios:${curios_version}"))
-    runtimeOnly(fg.deobf("maven.modrinth:caelus:${caelus_api_version}"))
+        runtimeOnly(fg.deobf("maven.modrinth:curios:${curios_version}"))
+        runtimeOnly(fg.deobf("maven.modrinth:caelus:${caelus_api_version}"))
+
+    implementation fg.deobf("curse.maven:minecolonies-245506:6107962")
+    // Minecolonies dependencies
+        runtimeOnly fg.deobf("curse.maven:structurize-298744:5977611")
+        runtimeOnly fg.deobf("curse.maven:multi-piston-303278:5204918")
+        runtimeOnly fg.deobf("curse.maven:blockui-522992:5280792")
+        runtimeOnly fg.deobf("curse.maven:domum-ornamentum-527361:6042695")
 }
 
 tasks.withType(JavaCompile).configureEach {
