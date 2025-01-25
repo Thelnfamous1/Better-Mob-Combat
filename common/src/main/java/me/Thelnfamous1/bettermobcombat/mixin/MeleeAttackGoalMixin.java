@@ -1,6 +1,8 @@
 package me.Thelnfamous1.bettermobcombat.mixin;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.Thelnfamous1.bettermobcombat.api.MobAttackWindup;
 import me.Thelnfamous1.bettermobcombat.logic.MobCombatHelper;
 import net.bettercombat.api.AttackHand;
@@ -35,8 +37,26 @@ public abstract class MeleeAttackGoalMixin extends Goal {
         });
     }
 
+    // This fixes a weird bug with instances that have the field set to true, which causes them to be unable to attack when very close to the target
+    @WrapOperation(method = "canContinueToUse", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/ai/goal/MeleeAttackGoal;followingTargetEvenIfNotSeen:Z", opcode = 180 /*GETFIELD*/))
+    private boolean wrap_followingTargetEvenIfNotSeen(MeleeAttackGoal instance, Operation<Boolean> original){
+        boolean followingTargetEvenIfNotSeen = original.call(instance);
+        if(followingTargetEvenIfNotSeen){
+            return MobCombatHelper.canUseBetterCombatWeapon(this.mob, (m, wa) -> {
+                AttackHand currentAttack = ((EntityPlayer_BetterCombat)m).getCurrentAttack();
+                return currentAttack == null;
+            });
+        }
+        return false;
+    }
+
     @WrapWithCondition(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/goal/MeleeAttackGoal;checkAndPerformAttack(Lnet/minecraft/world/entity/LivingEntity;D)V"))
     private boolean pre_checkAndPerformAttack(MeleeAttackGoal goal, LivingEntity target, double distance){
+        return bettermobcombat$allowCheckAndPerformAttackCall(target);
+    }
+
+    @Unique
+    protected boolean bettermobcombat$allowCheckAndPerformAttackCall(LivingEntity target) {
         return !this.bettermobcombat$useBetterCombatAttackCheck(target);
     }
 
@@ -46,6 +66,8 @@ public abstract class MeleeAttackGoalMixin extends Goal {
             AttackHand currentAttack = ((EntityPlayer_BetterCombat) m).getCurrentAttack();
             if (currentAttack != null) {
                 if (MobCombatHelper.isAttackReady(m) && MobCombatHelper.isWithinAttackRange(m, target, currentAttack.attack(), wa.attackRange())) {
+                    // helps some modded mobs not get stuck near targets
+                    //this.mob.getNavigation().stop();
                     MobCombatHelper.setDelayedUpswing(m, () -> {
                         ((MobAttackWindup) m).bettermobcombat$startUpswing(wa);
                         this.bettermobcombat$setTicksUntilNextAttack(((MobAttackWindup) m).bettermobcombat$getAttackCooldown());

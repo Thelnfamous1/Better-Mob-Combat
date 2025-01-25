@@ -11,6 +11,7 @@
     "compat.minecolonies.AttackMoveAIMixin",
     "compat.minecolonies.KnightCombatAIMixin",
     "compat.minecolonies.RaiderMeleeAIMixin",
+    "compat.modulargolems.GolemMeleeGoalMixin",
     "compat.recruits.AbstractRecruitEntityMixin",
     "compat.recruits.AttackUtilMixin",
     "compat.recruits.HorsemanAttackAIMixin",

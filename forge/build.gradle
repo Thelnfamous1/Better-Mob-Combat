@@ -133,6 +133,13 @@ dependencies {
         runtimeOnly fg.deobf("curse.maven:multi-piston-303278:5204918")
         runtimeOnly fg.deobf("curse.maven:blockui-522992:5280792")
         runtimeOnly fg.deobf("curse.maven:domum-ornamentum-527361:6042695")
+    implementation fg.deobf("curse.maven:modulargolems-690937:6058893")
+    // Modular Golems dependency
+        implementation fg.deobf("curse.maven:l2library-620203:5921890")
+    implementation fg.deobf("curse.maven:roamers-724447:5734709")
+    implementation fg.deobf("curse.maven:fake-player-845992:4785989")
+    implementation fg.deobf("curse.maven:it-takes-a-pillage-635843:4981343")
+    runtimeOnly fg.deobf("curse.maven:mob-battle-mod-268746:5950124")
 }
 
 tasks.withType(JavaCompile).configureEach {
