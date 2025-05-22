@@ -1,10 +1,10 @@
 package me.Thelnfamous1.bettermobcombat.mixin.compat.recruits;
 
 import com.talhanation.recruits.entities.ai.UseShield;
+import com.talhanation.recruits.pathfinding.AsyncPathfinderMob;
 import me.Thelnfamous1.bettermobcombat.logic.MobCombatHelper;
 import net.bettercombat.api.AttackHand;
 import net.bettercombat.api.EntityPlayer_BetterCombat;
-import net.minecraft.world.entity.PathfinderMob;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,8 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Pseudo
 @Mixin(value = UseShield.class, remap = false)
 public class UseShieldMixin {
-
-    @Shadow @Final public PathfinderMob entity;
+    @Shadow @Final public AsyncPathfinderMob entity;
 
     @Inject(method = "canRaiseShield", at = @At(value = "RETURN", ordinal = 1), cancellable = true)
     private void provideAlternateDistanceCheck(CallbackInfoReturnable<Boolean> cir){
