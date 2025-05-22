@@ -19,6 +19,7 @@ import net.bettercombat.logic.WeaponRegistry;
 import net.bettercombat.logic.knockback.ConfigurableKnockback;
 import net.bettercombat.mixin.LivingEntityAccessor;
 import net.bettercombat.utils.MathHelper;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -239,8 +240,16 @@ public class MobCombatHelper {
         // scale the attack range by the config multiplier, as this method is used for starting attacks, not damage application
         attackRange *= BetterMobCombat.getServerConfig().mob_begin_attack_range_multiplier;
 
+        // Quick distance check - if target is very close, allow attack regardless of complex collision
+        double simpleDistance = mob.distanceTo(target);
+        if (simpleDistance <= attackRange) { // Adjust threshold as needed
+            mob.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
+            return true;
+        }
+
         boolean isSpinAttack = attack.angle() > 180.0;
         Vec3 size = WeaponHitBoxes.createHitbox(attack.hitbox(), attackRange, isSpinAttack);
+
         OrientedBoundingBox obb = new OrientedBoundingBox(origin, size, mob.getXRot(), mob.getYRot());
         if (!isSpinAttack) {
             obb = obb.offsetAlongAxisZ(size.z / 2.0);

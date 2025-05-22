@@ -119,8 +119,57 @@ public class MobTargetFinder {
 
         @Override
         public boolean test(Entity target, LivingEntity mob) {
-            return this.obb.intersects(target.getBoundingBox().inflate(target.getPickRadius()))
-                    || this.obb.contains(target.position().add(0.0, target.getBbHeight() / 2.0F, 0.0));
+            AABB targetBox = target.getBoundingBox().inflate(target.getPickRadius());
+
+            // Check if OBB intersects with target's bounding box
+            if (this.obb.intersects(targetBox)) {
+                return true;
+            }
+
+            // Check multiple points on the target entity
+            Vec3 targetPos = target.position();
+            double halfHeight = target.getBbHeight() / 2.0F;
+
+            // Check center point
+            if (this.obb.contains(targetPos.add(0.0, halfHeight, 0.0))) {
+                return true;
+            }
+
+            // Check bottom point
+            if (this.obb.contains(targetPos)) {
+                return true;
+            }
+
+            // Check top point
+            if (this.obb.contains(targetPos.add(0.0, target.getBbHeight(), 0.0))) {
+                return true;
+            }
+
+            // For very close targets, check if any corner of their bounding box is within the OBB
+            double distance = mob.distanceTo(target);
+            if (distance <= 3.0) { // Only do expensive checks for close targets
+                AABB box = target.getBoundingBox();
+
+                // Check all 8 corners of the target's bounding box
+                Vec3[] corners = {
+                        new Vec3(box.minX, box.minY, box.minZ),
+                        new Vec3(box.minX, box.minY, box.maxZ),
+                        new Vec3(box.minX, box.maxY, box.minZ),
+                        new Vec3(box.minX, box.maxY, box.maxZ),
+                        new Vec3(box.maxX, box.minY, box.minZ),
+                        new Vec3(box.maxX, box.minY, box.maxZ),
+                        new Vec3(box.maxX, box.maxY, box.minZ),
+                        new Vec3(box.maxX, box.maxY, box.maxZ)
+                };
+
+                for (Vec3 corner : corners) {
+                    if (this.obb.contains(corner)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 
