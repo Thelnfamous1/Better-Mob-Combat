@@ -14,7 +14,6 @@
     "compat.modulargolems.GolemMeleeGoalMixin",
     "compat.recruits.AbstractRecruitEntityMixin",
     "compat.recruits.AttackUtilMixin",
-    "compat.recruits.HorsemanAttackAIMixin",
     "compat.recruits.PillagerMeleeAttackGoalMixin",
     "compat.recruits.RecruitEatGoalMixin",
     "compat.recruits.RecruitMeleeAttackGoalMixin",
