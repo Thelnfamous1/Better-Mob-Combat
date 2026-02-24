@@ -103,7 +103,7 @@ dependencies {
     compileOnly project(":common")
     //annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT:processor")
     annotationProcessor 'net.fabricmc:sponge-mixin:0.13.4+mixin.0.8.5'
-    runtimeOnly fg.deobf("lib:mobplayeranimator-forge:${project.mob_player_anim_version}-all")
+    runtimeOnly fg.deobf("lib:mobplayeranimator-forge:${project.mob_player_anim_version}")
 
     implementation fg.deobf("maven.modrinth:better-combat:${project.better_combat_version}-forge")
     // Better Combat Dependencies
